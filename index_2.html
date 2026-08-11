@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SalarioJusto — Descubre si tu salario es justo</title>
+<style>
+  :root{
+    --bg:#f5f3ec; --card:#ffffff; --ink:#17211f; --muted:#6b7a76;
+    --line:#e3e9ea; --teal:#0f766e; --teal-d:#0b5a54;
+    --teal-soft:#e2f2ef; --amber:#d97706; --amber-soft:#fdf0dd;
+    --shadow:0 1px 2px rgba(15,42,46,.06),0 8px 24px rgba(15,42,46,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--teal);text-decoration:none}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  /* Top bar */
+  header{position:sticky;top:0;z-index:20;background:rgba(245,243,236,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.3px}
+  .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#14b8a6);display:grid;place-items:center;color:#fff;font-weight:900;font-size:16px}
+  .brand small{font-weight:600;color:var(--muted);font-size:12px;margin-left:2px}
+  .badge-free{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-soft);padding:5px 11px;border-radius:999px}
+  /* Hero */
+  .hero{padding:56px 0 32px;text-align:center}
+  .hero h1{font-size:40px;line-height:1.08;letter-spacing:-1px;margin:0 0 14px;font-weight:850}
+  .hero h1 span{color:var(--teal)}
+  .hero p{font-size:18px;color:var(--muted);max-width:620px;margin:0 auto 26px}
+  .cta{display:inline-flex;align-items:center;gap:9px;background:var(--teal);color:#fff;font-weight:700;font-size:17px;border:none;padding:15px 28px;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);transition:transform .08s,background .15s}
+  .cta:hover{background:var(--teal-d);transform:translateY(-1px)}
+  .trust{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:26px;color:var(--muted);font-size:14px;font-weight:600}
+  .trust span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal)}
+  .counter{margin-top:30px;font-size:14px;color:var(--muted)}
+  .counter b{color:var(--ink);font-size:15px}
+  /* How it works */
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:38px 0 8px}
+  .how .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .how .n{width:28px;height:28px;border-radius:8px;background:var(--teal-soft);color:var(--teal);font-weight:800;display:grid;place-items:center;margin-bottom:10px}
+  .how h3{margin:0 0 5px;font-size:15px}
+  .how p{margin:0;font-size:13.5px;color:var(--muted)}
+  /* ---- Landing (minimal, japonés-inspirado) ---- */
+  .hero-wrap{position:relative;text-align:center;padding:76px 0 12px}
+  .enso{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:320px;height:320px;pointer-events:none;z-index:0;opacity:.12}
+  .enso svg{width:100%;height:100%}
+  .kicker{position:relative;z-index:1;font-size:11.5px;font-weight:800;letter-spacing:3.5px;color:var(--teal);text-transform:uppercase;margin-bottom:24px}
+  .hero-wrap h1{position:relative;z-index:1;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:54px;line-height:1.04;letter-spacing:-1.2px;margin:0 0 22px;color:var(--ink)}
+  .hero-wrap h1 em{font-style:italic;color:var(--teal)}
+  .lede{position:relative;z-index:1;font-size:18px;line-height:1.62;color:var(--muted);max-width:540px;margin:0 auto 30px}
+  .hero-wrap .cta{position:relative;z-index:1}
+  .microtrust{position:relative;z-index:1;margin-top:18px;font-size:11.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:700}
+  .stripe{margin:56px auto 0;max-width:600px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;font-size:12.5px;color:var(--muted);letter-spacing:.4px;text-align:center}
+  .stripe b{color:var(--ink);font-weight:800}
+  .steps{list-style:none;padding:0;margin:36px auto 24px;max-width:600px;text-align:left}
+  .steps li{display:flex;gap:22px;align-items:baseline;padding:22px 6px;border-top:1px solid var(--line)}
+  .steps li:last-child{border-bottom:1px solid var(--line)}
+  .steps .sn{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--teal);opacity:.5;min-width:30px}
+  .steps h3{margin:0 0 3px;font-size:16px;letter-spacing:-.2px}
+  .steps p{margin:0;font-size:14px;color:var(--muted);line-height:1.5}
+  /* Narrativa / manifiesto */
+  .story{max-width:660px;margin:72px auto 0;text-align:left;position:relative;z-index:1}
+  .story .eyebrow,.howhead .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:3px;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:26px}
+  .story .big{font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.22;letter-spacing:-.6px;color:var(--ink);font-weight:700;margin:0 0 16px}
+  .story .big mark{background:linear-gradient(transparent 55%, #cfeae3 0);color:var(--teal-d);padding:0 3px;border-radius:2px}
+  .story .lead{font-size:17px;line-height:1.7;color:var(--muted);margin:0 0 48px}
+  .story .lead:last-child{margin-bottom:0}
+  .howhead{text-align:left}
+  /* recorrido: el laberinto que se vuelve recto y aterriza en los 3 pasos */
+  .journey{position:relative;max-width:724px;margin:72px auto 0;padding-left:80px}
+  .thread{position:absolute;left:0;top:0;width:80px;height:100%;pointer-events:none}
+  .journey-body{position:relative}
+  .journey .story{max-width:none;margin:0}
+  .journey .howhead{max-width:none;margin:56px 0 6px}
+  .journey .steps{max-width:none;margin:16px 0 0}
+  /* promesa de correo */
+  .promise{font-size:12.5px;color:var(--muted);line-height:1.55;margin:14px 0 0;background:var(--teal-soft);border-radius:10px;padding:11px 13px;text-align:left}
+  .promise b{color:var(--teal-d)}
+  @media(max-width:720px){ .story .big{font-size:26px} .journey{margin-top:56px;padding-left:58px} .thread{width:58px} }
+  /* Cards / form */
+  section.panel{display:none;padding:34px 0 60px}
+  section.panel.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px}
+  .card h2{margin:0 0 4px;font-size:22px;letter-spacing:-.4px}
+  .card .sub{color:var(--muted);margin:0 0 22px;font-size:14.5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .field{margin-bottom:2px}
+  label.lbl{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px}
+  label.lbl .opt{color:var(--muted);font-weight:500}
+  select,input[type=number],input[type=text]{
+    width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fbfcfc;font-size:15px;color:var(--ink);font-family:inherit
+  }
+  select:focus,input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+  .salaryrow{display:flex;gap:10px}
+  .salaryrow input{flex:1}
+  .salaryrow select{width:110px;flex:none}
+  .curbox{width:110px;flex:none;display:flex;align-items:center;justify-content:center;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#eef1f1;color:var(--muted);font-size:14px;font-weight:700}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .mini-sub{display:block;font-style:normal;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:5px}
+  .addvar{background:none;border:1px dashed #c3d3cf;color:var(--teal);font-weight:700;font-size:14px;padding:12px 14px;border-radius:10px;cursor:pointer;width:100%;text-align:left;font-family:inherit}
+  .addvar:hover{background:var(--teal-soft);border-color:var(--teal)}
+  .varremove{float:right;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;font-weight:600}
+  .varremove:hover{color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+  .chip{border:1px solid var(--line);background:#fbfcfc;padding:8px 13px;border-radius:999px;font-size:13.5px;cursor:pointer;user-select:none;font-weight:600;color:var(--muted);transition:all .12s}
+  .chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .full{grid-column:1/-1}
+  .formfoot{display:flex;align-items:center;justify-content:flex-end;gap:16px;margin-top:24px;flex-wrap:wrap}
+  .privacy-note{font-size:12.5px;color:var(--muted);max-width:460px}
+  /* Results */
+  .resulthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+  .pct-big{font-size:15px;color:var(--muted)}
+  .verdict{font-size:15.5px;font-weight:600;margin:14px 0 4px;padding:14px 16px;border-radius:12px;background:var(--teal-soft);color:var(--teal-d);border:1px solid #cfe8e2}
+  .verdict.low{background:var(--amber-soft);color:#92500a;border-color:#f6dcb4}
+  .chartwrap{margin:22px 0 6px}
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 4px}
+  .stat{background:#fbfcfc;border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+  .stat .k{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .stat .v{font-size:16px;font-weight:800;margin-top:3px}
+  .stat.me{background:var(--amber-soft);border-color:#f6dcb4}
+  .stat.me .k{color:#92500a}
+  .conf{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13.5px;color:var(--muted)}
+  .conf .pill{font-weight:800;padding:4px 10px;border-radius:999px;font-size:12px}
+  .pill.alta{background:#dcf5ee;color:#0b5a54}
+  .pill.media{background:#fef3d6;color:#8a5a06}
+  .pill.baja{background:#fde3e0;color:#9b2c22}
+  .feed{margin-top:20px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px}
+  .feed .ic{font-size:22px}
+  .feed b{font-weight:800}
+  .feed small{opacity:.9;display:block;font-size:12.5px;margin-top:2px}
+  /* Auth */
+  .authbox{margin-top:22px;border-top:1px dashed var(--line);padding-top:22px}
+  .authbox h3{margin:0 0 3px;font-size:16px}
+  .authbox p{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+  .authbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .authbtn{display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid var(--line);background:#fff;padding:12px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);transition:background .12s}
+  .authbtn:hover{background:#f4f6f6}
+  .authbtn .g{color:#4285F4}.authbtn .f{color:#1877F2}
+  .secondary{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);color:var(--ink);font-weight:700;font-size:15px;padding:13px 22px;border-radius:11px;cursor:pointer}
+  .secondary:hover{background:#f4f6f6}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+  /* lean result */
+  .pctlead{text-align:center;margin:2px 0 6px}
+  .pctnum{font-size:60px;font-weight:850;letter-spacing:-2px;line-height:1;color:var(--teal)}
+  .pctcap{color:var(--muted);font-size:13.5px;font-weight:700;margin-top:2px;text-transform:uppercase;letter-spacing:.6px}
+  .verdict-big{font-family:Georgia,'Times New Roman',serif;font-size:29px;line-height:1.22;letter-spacing:-.4px;color:var(--ink);font-weight:700;max-width:540px;margin:0 auto}
+  .verdict-big b{color:var(--teal)}
+  .verdict-sub{font-size:14.5px;color:var(--muted);margin-top:11px}
+  /* resultado en dos columnas */
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+  .res-left,.res-right{min-width:0}
+  .res-right{text-align:left}
+  .res-right .eyebrow{display:block;font-size:11px;font-weight:800;letter-spacing:2.5px;color:var(--teal);text-transform:uppercase;margin-bottom:10px}
+  .market-line{font-size:15px;color:var(--muted);line-height:1.55;margin:0 0 14px}
+  .market-line b{color:var(--ink);font-weight:800}
+  .res-right .verdict-big{font-size:25px;max-width:none;margin:0;text-align:left}
+  .res-right .verdict-sub{text-align:left;margin-top:8px}
+  .res-right .verdict{text-align:left;margin:14px 0 2px}
+  .res-right .conf{justify-content:flex-start;margin-top:14px}
+  .profile-sum{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 2px}
+  .psum-chip{font-size:11.5px;background:#eef2f1;color:var(--ink);padding:5px 10px;border-radius:999px;font-weight:600}
+  .psum-chip.skill{background:var(--teal-soft);color:var(--teal-d)}
+  .psum-chip.yes{background:#dcf5ee;color:#0b5a54}
+  .psum-chip.no{background:#fde3e0;color:#9b2c22}
+  @media(max-width:760px){ .result-grid{grid-template-columns:1fr;gap:20px} }
+  .prest-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;margin-top:12px}
+  .prest-badge.yes{background:#dcf5ee;color:#0b5a54}
+  .prest-badge.no{background:#fde3e0;color:#9b2c22}
+  .verdict{font-size:15px;font-weight:700;margin:6px 0 2px;padding:12px 15px;border-radius:12px;background:var(--teal-soft);color:var(--teal-d);text-align:center}
+  .verdict.low{background:var(--amber-soft);color:#92500a}
+  .minirow{display:flex;gap:12px;margin:16px 0 2px}
+  .mini{flex:1;background:#fbfcfc;border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:center}
+  .mini span{display:block;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .mini b{font-size:22px;font-weight:850;margin-top:4px;display:block}
+  .conf{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:12.5px;color:var(--muted);justify-content:center;flex-wrap:wrap}
+  .authcap{font-size:12px;color:var(--muted);text-align:center;margin:12px 0 0}
+  .authbox{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px}
+  /* switch prestaciones */
+  .switch{display:flex;align-items:center;gap:11px;cursor:pointer;font-size:14px;font-weight:600;user-select:none}
+  .switch input{display:none}
+  .switch .track{width:44px;height:25px;border-radius:999px;background:#cdd6d7;position:relative;transition:.15s;flex:none}
+  .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch input:checked + .track{background:var(--teal)}
+  .switch input:checked + .track::after{left:22px}
+  /* agregar skill */
+  .addskill{display:flex;gap:8px;margin-top:10px}
+  .addskill input{flex:1}
+  .addskill button{border:1px solid var(--line);background:#fbfcfc;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer;color:var(--teal);white-space:nowrap}
+  .addskill button:hover{background:var(--teal-soft)}
+  #skillHint{font-weight:800}
+  /* Personas — carrusel animado */
+  .peoplewrap{margin:48px auto 0;max-width:560px;position:relative;z-index:1}
+  .marquee{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+  .mtrack{display:flex;width:max-content;animation:scrollx 30s linear infinite}
+  .marquee:hover .mtrack{animation-play-state:paused}
+  @keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .av{width:64px;height:64px;flex:none;margin-right:16px;border-radius:50%;box-shadow:0 2px 8px rgba(15,42,46,.08)}
+  .people-cap{margin-top:16px;font-size:13.5px;color:var(--muted);text-align:center}
+  .people-cap b{color:var(--ink);font-weight:800}
+  @media(prefers-reduced-motion:reduce){.mtrack{animation:none}}
+  /* Formulario en la misma página */
+  #formCard{margin-top:60px;scroll-margin-top:80px}
+  /* Login / skip */
+  .narrow{max-width:520px}
+  .login-card{text-align:center;padding:34px 28px}
+  .check{width:48px;height:48px;border-radius:50%;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center;font-size:24px;font-weight:800;margin:0 auto 16px}
+  .login-card h2{margin:0 0 6px}
+  .login-card .authbtns{margin-top:4px}
+  .emailrow{display:flex;gap:8px;margin:18px 0 0}
+  .emailrow input{flex:1;padding:12px 13px;border:1px solid var(--line);border-radius:11px;font-size:15px;background:#fbfcfc;font-family:inherit}
+  .emailrow input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft)}
+  .emailrow .cta{padding:12px 18px;font-size:15px;white-space:nowrap}
+  .or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:11px;margin:18px 0 12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .authbtns.two{grid-template-columns:1fr 1fr}
+  .authbtn{display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid var(--line);background:#fff;padding:13px;border-radius:11px;font-weight:700;font-size:14.5px;cursor:pointer;color:var(--ink);transition:background .12s}
+  .authbtn:hover{background:#f4f6f6}
+  .authbtn .g{color:#4285F4}.authbtn .f{color:#1877F2}
+  .skip{margin-top:18px;background:none;border:none;color:var(--muted);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .skip:hover{color:var(--ink)}
+  /* Recomendaciones */
+  .reco-card{margin-top:16px}
+  .reco-title{margin:0;font-size:20px;letter-spacing:-.3px}
+  .recos{list-style:none;padding:0;margin:16px 0 0}
+  .reco{display:flex;align-items:center;gap:14px;padding:15px 4px;border-top:1px solid var(--line)}
+  .reco:last-child{border-bottom:1px solid var(--line)}
+  .reco .ic{width:36px;height:36px;border-radius:10px;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center;font-size:17px;flex:none}
+  .reco .body{flex:1}
+  .reco .body b{display:block;font-size:14.5px}
+  .reco .body span{font-size:13px;color:var(--muted)}
+  .reco .up{font-weight:850;color:var(--teal);font-size:14.5px;white-space:nowrap}
+  .reco-foot{margin:16px 0 0;font-size:12px;color:var(--muted);text-align:center;font-style:italic}
+  /* Modal */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(15,42,46,.45);z-index:50;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.on{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:26px;text-align:center;box-shadow:var(--shadow)}
+  .modal h3{margin:0 0 8px}
+  .modal p{color:var(--muted);font-size:14px;margin:0 0 18px}
+  /* Footer */
+  footer{border-top:1px solid var(--line);padding:38px 0 96px;color:var(--muted);font-size:13.5px;margin-top:24px}
+  .footcols{display:flex;gap:40px;flex-wrap:wrap;justify-content:space-between}
+  .fbrand{max-width:280px}
+  .fbrand .brand{font-size:17px;margin-bottom:9px}
+  .fbrand p{margin:0;font-size:13px;line-height:1.55}
+  .fcol{display:flex;flex-direction:column;gap:10px}
+  .fcol h4{margin:0 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink);font-weight:800}
+  .fcol a{color:var(--muted);font-size:13.5px;cursor:pointer}
+  .fcol a:hover{color:var(--teal)}
+  .fbottom{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12px}
+  .modal p a{color:var(--teal);font-weight:700}
+  .modal .faq{text-align:left;font-size:13.5px}
+  .modal .faq b{display:block;margin-top:10px;color:var(--ink)}
+  .proto-tag{position:fixed;bottom:14px;right:14px;background:var(--ink);color:#fff;font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:999px;z-index:40;opacity:.9}
+  @media(max-width:720px){
+    .hero-wrap h1{font-size:38px}.grid2{grid-template-columns:1fr}.how{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(3,1fr)}.authbtns{grid-template-columns:1fr}
+    .hero-wrap{padding-top:48px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div class="brand"><span class="logo">S</span>SalarioJusto<small>salariojusto.com</small></div>
+    <span class="badge-free">Gratis · 100% anónimo</span>
+  </div>
+</header>
+
+<!-- ============ LANDING (hero + formulario en una sola página) ============ -->
+<section id="landing" class="panel active">
+  <div class="wrap hero-wrap">
+    <div class="enso" aria-hidden="true">
+      <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="84" fill="none" stroke="#0f766e" stroke-width="11" stroke-linecap="round" stroke-dasharray="486 44" transform="rotate(-28 100 100)"/></svg>
+    </div>
+    <div class="kicker">Transparencia salarial · Guatemala</div>
+    <h1>Descubre lo que<br><em>de verdad</em> vales.</h1>
+    <p class="lede">Tu sueldo, frente al mercado real, en 30 segundos. Anónimo, gratis y cada vez más exacto — porque cada respuesta afina el modelo.</p>
+    <button class="cta" onclick="scrollToForm()">Descubrir mi rango &nbsp;→</button>
+    <div class="microtrust">30 segundos · sin registro · sin nombres</div>
+
+    <!-- Personas (carrusel animado) -->
+    <div class="peoplewrap">
+      <div class="marquee"><div class="mtrack" id="avatarTrack"></div></div>
+      <div class="people-cap"><b>+2,620 personas</b> ya conocen su valor en el mercado</div>
+    </div>
+
+    <!-- El laberinto del salario que se vuelve recto con 3 pasos simples -->
+    <div class="journey">
+      <svg class="thread" id="thread" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="journey-body">
+        <div class="story">
+          <span class="eyebrow">Por qué existe SalarioJusto</span>
+
+          <p class="big">El salario siempre ha sido un <mark>secreto</mark>.</p>
+          <p class="lead">Nadie dice cuánto gana. Y en ese silencio no puedes saber si te pagan lo justo — o si podrías ganar mucho más.</p>
+
+          <p class="big">Ese misterio <mark>te cuesta dinero</mark>.</p>
+          <p class="lead">Sin un punto de referencia pides menos de lo que vales, o te quedas donde estás sin saber que el mercado paga más.</p>
+
+          <p class="big">Saber tu lugar se siente como un <mark>laberinto</mark>.</p>
+          <p class="lead">Rumores, puertas cerradas y cero datos. Nadie te dice por dónde ir.</p>
+
+          <p class="big">Por eso creamos <mark>SalarioJusto</mark>.</p>
+          <p class="lead">Juntos y en anonimato compartimos lo que ganamos, nos rankeamos en el mercado y vemos qué habilidades y puestos valen más.</p>
+
+          <p class="big">Y aquí el laberinto <mark>se vuelve recto</mark>.</p>
+          <p class="lead">Lo complicado lo hace el modelo por ti. Tú solo sigues tres pasos simples:</p>
+        </div>
+
+        <div class="howhead"><span class="eyebrow">Así funciona</span></div>
+        <ol class="steps">
+          <li><span class="sn">01</span><div><h3>Cuéntanos tu perfil</h3><p>Rol, experiencia y habilidades. Un minuto, sin crear cuenta.</p></div></li>
+          <li><span class="sn">02</span><div><h3>Mira tu percentil</h3><p>Dónde caes en el mercado y si tienes espacio para ganar más.</p></div></li>
+          <li><span class="sn">03</span><div><h3>Recibe tu plan</h3><p>Tu rango y las palancas para ganar más. Cada respuesta afina el modelo.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="wrap" id="formCard">
+    <div class="card">
+      <h2>Tu perfil laboral</h2>
+      <p class="sub">Nada de esto te identifica.</p>
+      <div class="grid2">
+        <div class="field">
+          <label class="lbl">Profesión / rol</label>
+          <select id="role"></select>
+          <input id="roleOther" type="text" placeholder="Escribe tu profesión" maxlength="40" style="display:none;margin-top:8px">
+        </div>
+        <div class="field">
+          <label class="lbl">Nivel / seniority</label>
+          <select id="sen">
+            <option value="junior">Junior</option>
+            <option value="mid" selected>Semi-senior</option>
+            <option value="senior">Senior</option>
+            <option value="lead">Líder / Jefe</option>
+            <option value="manager">Gerente</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Años de experiencia</label>
+          <select id="exp">
+            <option value="0-2">0 – 2 años</option>
+            <option value="3-5" selected>3 – 5 años</option>
+            <option value="6-10">6 – 10 años</option>
+            <option value="10+">Más de 10 años</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Educación</label>
+          <select id="edu">
+            <option value="hs">Diversificado / bachillerato</option>
+            <option value="tech">Técnico</option>
+            <option value="bach" selected>Licenciatura</option>
+            <option value="master">Maestría o más</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Departamento</label>
+          <select id="loc">
+            <option value="gt" selected>Guatemala</option>
+            <option value="sac">Sacatepéquez</option>
+            <option value="xela">Quetzaltenango</option>
+            <option value="esc">Escuintla</option>
+            <option value="otro">Otro departamento</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Industria</label>
+          <select id="ind">
+            <option value="tech">Tecnología / software</option>
+            <option value="fin">Banca / finanzas</option>
+            <option value="manu">Manufactura</option>
+            <option value="com">Comercio / retail</option>
+            <option value="salud">Salud</option>
+            <option value="edu">Educación</option>
+            <option value="tel">Telecomunicaciones</option>
+            <option value="serv" selected>Servicios</option>
+            <option value="agro">Agroindustria / agropecuario</option>
+            <option value="constr">Construcción / inmobiliaria</option>
+            <option value="turismo">Turismo / hotelería / restaurantes</option>
+            <option value="bpo">Call center / BPO</option>
+            <option value="transp">Transporte / logística</option>
+            <option value="gob">Gobierno / ONG</option>
+            <option value="otro">Otra</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Tamaño de la empresa</label>
+          <select id="size">
+            <option value="micro">Micro (1–10)</option>
+            <option value="peq">Pequeña (11–50)</option>
+            <option value="med" selected>Mediana (51–200)</option>
+            <option value="grande">Grande (200+)</option>
+            <option value="multi">Multinacional</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Tu salario base mensual</label>
+          <div class="salaryrow">
+            <input id="salary" type="number" inputmode="numeric" placeholder="Ej. 8000" min="0">
+            <select id="cur"><option value="GTQ" selected>Q GTQ</option><option value="USD">$ USD</option></select>
+          </div>
+        </div>
+        <div class="field full" id="varToggle">
+          <button type="button" class="addvar" onclick="showVar()">+ Agregar variable o comisiones</button>
+        </div>
+        <div class="field full" id="varField" style="display:none">
+          <label class="lbl">Variable mensual <span class="opt">(comisiones / bonos)</span> <a class="varremove" onclick="hideVar()">quitar</a></label>
+          <div class="salaryrow">
+            <input id="variable" type="number" inputmode="numeric" placeholder="Ej. 4000" min="0">
+            <div class="curbox" id="varCur">Q GTQ</div>
+          </div>
+          <div class="hint">Para trabajos con base baja y comisión alta. Usa un promedio mensual.</div>
+        </div>
+        <div class="field full">
+          <label class="lbl">Habilidades <span class="opt">(elige hasta 5) · <span id="skillHint">0/5</span></span></label>
+          <div class="chips" id="skills"></div>
+          <div class="addskill">
+            <input id="customSkill" type="text" placeholder="Agregar otra…" maxlength="26"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSkill();}">
+            <button type="button" onclick="addCustomSkill()">+ Agregar</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label class="switch">
+            <input type="checkbox" id="prest" checked>
+            <span class="track"></span>
+            <span class="swtxt">Recibo prestaciones de ley (IGSS, aguinaldo, bono 14)</span>
+          </label>
+        </div>
+      </div>
+      <div class="formfoot">
+        <button class="cta" onclick="compute()">Ver mi resultado &nbsp;→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOGIN / SKIP ============ -->
+<section id="login" class="panel">
+  <div class="wrap narrow">
+    <div class="card login-card">
+      <div class="check">✓</div>
+      <h2>Tu resultado está listo</h2>
+      <p class="sub">Guarda tu resultado con solo tu correo. Sin contraseñas ni formularios: te enviamos un enlace para entrar y volver a verlo cuando quieras.</p>
+      <div class="emailrow">
+        <input id="loginEmail" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+        <button class="cta" onclick="loginWith('correo')">Continuar &nbsp;→</button>
+      </div>
+      <p class="promise">🔒 <b>Nuestra promesa: cero spam.</b> Pedimos tu correo por una sola razón — reducir el ruido en los datos y no duplicar registros. No guardamos nada tuyo ni compartimos tu información.</p>
+      <div class="or">o continúa con</div>
+      <div class="authbtns two">
+        <button class="authbtn" onclick="loginWith('Google')"><span class="g">●</span> Google</button>
+        <button class="authbtn" onclick="loginWith('teléfono')">📱 Teléfono</button>
+      </div>
+      <button class="skip" onclick="proceedToResults()">Ver mis resultados sin cuenta →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULT ============ -->
+<section id="result" class="panel">
+  <div class="wrap">
+    <div class="card">
+      <div class="result-grid">
+        <div class="res-left">
+          <div class="chartwrap"><svg id="chart" width="100%" viewBox="0 0 560 300" role="img" aria-label="Distribución de salarios del mercado"></svg></div>
+          <div class="minirow">
+            <div class="mini"><span>Mediana del mercado</span><b id="medVal"></b></div>
+            <div class="mini"><span>Tu compensación</span><b id="youVal"></b><em id="youBreak" class="mini-sub"></em></div>
+          </div>
+        </div>
+        <div class="res-right">
+          <span class="eyebrow">Tu resultado</span>
+          <p class="market-line" id="marketLine"></p>
+          <div class="verdict-big" id="verdictBig"></div>
+          <div class="verdict-sub" id="verdictSub"></div>
+          <div class="profile-sum" id="profileSum"></div>
+          <div class="conf"><span class="pill" id="confPill"></span><span id="confText"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recomendaciones basadas en datos -->
+    <div class="card reco-card">
+      <h2 class="reco-title">Cómo ganar más</h2>
+      <p class="sub">Para mejorar tu salario, el mercado premia estos puntos. Trabájalos para cobrar más.</p>
+      <ol class="recos" id="recos"></ol>
+      <p class="reco-foot" id="recoFoot"></p>
+    </div>
+
+    <div class="btnrow">
+      <button class="secondary" onclick="go('landing')">← Volver al inicio</button>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal">
+    <h3 id="modalTitle">Prototipo</h3>
+    <p id="modalBody"></p>
+    <button class="cta" onclick="closeModal()">Entendido</button>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap footcols">
+    <div class="fbrand">
+      <div class="brand"><span class="logo">S</span>SalarioJusto</div>
+      <p>Transparencia salarial para Guatemala. Gratis, anónimo y hecho para que negocies con datos.</p>
+    </div>
+    <div class="fcol">
+      <h4>Producto</h4>
+      <a onclick="openInfo('como')">Cómo funciona</a>
+      <a onclick="openInfo('faq')">Preguntas frecuentes</a>
+    </div>
+    <div class="fcol">
+      <h4>Nosotros</h4>
+      <a onclick="openInfo('goal')">Nuestra misión</a>
+      <a onclick="openInfo('contact')">Contáctanos</a>
+    </div>
+    <div class="fcol">
+      <h4>Legal</h4>
+      <a onclick="openInfo('terms')">Términos y condiciones</a>
+      <a onclick="openInfo('privacy')">Privacidad</a>
+    </div>
+  </div>
+  <div class="wrap fbottom">
+    <span>© 2026 SalarioJusto · salariojusto.com</span>
+    <span>Prototipo · datos ficticios simulados</span>
+  </div>
+</footer>
+<div class="proto-tag">PROTOTIPO · datos ficticios</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   CONFIG SUPABASE
+   Pega aquí la URL y la anon key de tu proyecto (Settings → API).
+   Mientras sean los valores de ejemplo, la app funciona en modo
+   DEMO con un modelo local (datos ficticios en el navegador).
+   ============================================================ */
+const SUPABASE_URL      = 'https://pjxigifpvljaurccwler.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqeGlnaWZwdmxqYXVyY2N3bGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDE5NzQsImV4cCI6MjEwMTk3Nzk3NH0.zne-d4Y0ce6dG7z5i-FtblXAOyETpT2668vNsTT5syo';
+const USE_DB = /^https:\/\/[a-z0-9-]+\.supabase\.co/.test(SUPABASE_URL) && (SUPABASE_ANON_KEY||'').length > 20;
+const sb = (USE_DB && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+</script>
+<script>
+/* ============================================================
+   SalarioJusto — motor de percentiles (modo DEMO local)
+   ============================================================ */
+
+// --- Catálogos ---
+const ROLES = {
+  dev:      {label:"Desarrollador/a de Software", base:14000, subs:520},
+  data:     {label:"Analista de Datos",           base:13000, subs:190},
+  pm:       {label:"Gerente de Proyecto (PM)",     base:18000, subs:150},
+  design:   {label:"Diseñador/a UX / Gráfico",     base:9500,  subs:130},
+  mkt:      {label:"Marketing Digital",            base:9500,  subs:160},
+  contador: {label:"Contador/a",                   base:8500,  subs:340},
+  ventas:   {label:"Ejecutivo/a de Ventas",        base:7500,  subs:280},
+  rrhh:     {label:"Recursos Humanos",             base:9000,  subs:120},
+  medico:   {label:"Médico/a",                     base:15000, subs:90},
+  civil:    {label:"Ingeniero/a Civil",            base:11000, subs:80},
+  admin:    {label:"Asistente Administrativo/a",   base:5200,  subs:300},
+  cc:       {label:"Servicio al Cliente / Call",   base:5500,  subs:260},
+};
+
+const SEN  = {mult:{junior:.7,mid:1,senior:1.5,lead:2,manager:2.4}, share:{junior:.30,mid:.38,senior:.22,lead:.07,manager:.03}, label:{junior:"Junior",mid:"Semi-senior",senior:"Senior",lead:"Líder",manager:"Gerente"}};
+const EXP  = {mult:{"0-2":.9,"3-5":1,"6-10":1.15,"10+":1.28}, share:{"0-2":.30,"3-5":.35,"6-10":.25,"10+":.10}, label:{"0-2":"0–2 años","3-5":"3–5 años","6-10":"6–10 años","10+":"10+ años"}};
+const EDU  = {mult:{hs:.85,tech:.95,bach:1,master:1.2}, share:{hs:.15,tech:.25,bach:.45,master:.15}, label:{hs:"Bachillerato",tech:"Técnico",bach:"Licenciatura",master:"Maestría+"}};
+const LOC  = {mult:{gt:1,sac:.95,xela:.8,esc:.88,otro:.75}, share:{gt:.55,sac:.08,xela:.12,esc:.05,otro:.20}, label:{gt:"Guatemala",sac:"Sacatepéquez",xela:"Quetzaltenango",esc:"Escuintla",otro:"Interior"}};
+const SIZE = {mult:{micro:.8,peq:.9,med:1,grande:1.2,multi:1.45}, share:{micro:.2,peq:.3,med:.3,grande:.15,multi:.05}, label:{micro:"Micro",peq:"Pequeña",med:"Mediana",grande:"Grande",multi:"Multinacional"}};
+const IND  = {mult:{tech:1.15,fin:1.2,manu:1,com:.9,salud:1.05,edu:.85,tel:1.1,serv:.95,gob:.92,agro:.9,constr:1.0,turismo:.85,bpo:.95,transp:.95,otro:1}, share:0.11, label:{tech:"Tecnología",fin:"Finanzas",manu:"Manufactura",com:"Comercio",salud:"Salud",edu:"Educación",tel:"Telecom",serv:"Servicios",gob:"Gobierno/ONG",agro:"Agroindustria",constr:"Construcción",turismo:"Turismo",bpo:"Call center/BPO",transp:"Transporte/logística",otro:"Otra"}};
+
+// Habilidades sugeridas por rol (las más pertinentes primero)
+const SKILLS_BY_ROLE = {
+  dev:      [{l:"Inglés avanzado",p:.10},{l:"Cloud / AWS",p:.08},{l:"React",p:.05},{l:"Python",p:.05},{l:"Node.js",p:.04},{l:"SQL",p:.03},{l:"Docker / DevOps",p:.05}],
+  data:     [{l:"Python",p:.06},{l:"SQL",p:.05},{l:"Machine Learning / IA",p:.09},{l:"Power BI / Tableau",p:.05},{l:"Inglés avanzado",p:.08},{l:"Estadística",p:.04}],
+  pm:       [{l:"Certificación PMP",p:.08},{l:"Scrum / Agile",p:.06},{l:"Liderazgo de equipo",p:.05},{l:"Inglés avanzado",p:.08},{l:"Jira",p:.03},{l:"Presupuestos",p:.04}],
+  design:   [{l:"Figma",p:.06},{l:"UX Research",p:.06},{l:"Adobe Illustrator",p:.04},{l:"Prototipado",p:.04},{l:"Portafolio sólido",p:.05},{l:"Inglés avanzado",p:.06}],
+  mkt:      [{l:"Google / Meta Ads",p:.06},{l:"SEO / SEM",p:.05},{l:"Analítica web",p:.05},{l:"Inglés avanzado",p:.07},{l:"Manejo de CRM",p:.04},{l:"Contenido / Copy",p:.03}],
+  contador: [{l:"NIIF",p:.06},{l:"SAT / impuestos",p:.05},{l:"ERP (SAP)",p:.06},{l:"Excel avanzado",p:.03},{l:"Auditoría",p:.05},{l:"Inglés",p:.06}],
+  ventas:   [{l:"Cierre de ventas",p:.06},{l:"Manejo de CRM",p:.04},{l:"Prospección",p:.04},{l:"Negociación",p:.05},{l:"Inglés avanzado",p:.08}],
+  rrhh:     [{l:"Reclutamiento",p:.05},{l:"Nómina",p:.04},{l:"Legislación laboral",p:.05},{l:"Clima organizacional",p:.04},{l:"HRIS",p:.05},{l:"Inglés",p:.06}],
+  medico:   [{l:"Especialidad",p:.10},{l:"Colegiado activo",p:.04},{l:"Emergencias",p:.06},{l:"Cirugía",p:.09},{l:"Inglés",p:.05}],
+  civil:    [{l:"AutoCAD",p:.05},{l:"Gestión de obra",p:.06},{l:"Revit / BIM",p:.06},{l:"Presupuestos",p:.05},{l:"Supervisión",p:.04},{l:"Inglés",p:.05}],
+  admin:    [{l:"Excel avanzado",p:.05},{l:"Inglés",p:.07},{l:"Gestión documental",p:.03},{l:"ERP",p:.05},{l:"Atención al cliente",p:.03}],
+  cc:       [{l:"Inglés bilingüe",p:.12},{l:"Ventas telefónicas",p:.05},{l:"Manejo de CRM",p:.04},{l:"Soporte técnico",p:.05}],
+};
+const MAX_SKILLS = 5;
+const USD_RATE = 7.8;
+let selectedSkills = new Map(); // label -> prem
+let LAST = {st:null, inp:null};   // guarda el último cálculo entre pantallas
+// Profesión personalizada (cuando no está en la lista): base neutra y pocos datos
+const DEFAULT_ROLE = {base:9000, subs:12};
+const GENERIC_SKILLS = [{l:"Inglés avanzado",p:.09},{l:"Excel avanzado",p:.04},{l:"Liderazgo de equipo",p:.05},{l:"Manejo de CRM",p:.03},{l:"Atención al cliente",p:.03},{l:"Computación / Office",p:.02}];
+function roleMeta(inp){
+  if(inp.role==='__other__') return {base:DEFAULT_ROLE.base, subs:DEFAULT_ROLE.subs, label:(inp.roleCustom||'Tu profesión')};
+  const r=ROLES[inp.role]; return {base:r.base, subs:r.subs, label:r.label};
+}
+
+// --- utilidades ---
+function avgMult(dim){ // media ponderada por participación
+  let s=0; for(const k in dim.mult){ s += dim.mult[k]*dim.share[k]; } return s;
+}
+const AVG = {sen:avgMult(SEN),exp:avgMult(EXP),edu:avgMult(EDU),loc:avgMult(LOC),size:avgMult(SIZE),
+             ind:(function(){let s=0,n=0;for(const k in IND.mult){s+=IND.mult[k];n++;}return s/n;})()};
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function gauss(rng){let u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function pctl(sorted,p){const idx=(sorted.length-1)*p;const lo=Math.floor(idx),hi=Math.ceil(idx);if(lo===hi)return sorted[lo];return sorted[lo]+(sorted[hi]-sorted[lo])*(idx-lo);}
+function round100(x){return Math.round(x/100)*100;}
+
+// --- el motor: fallback jerárquico + distribución lognormal ---
+const SIGMA = 0.26; // dispersión del mercado (log)
+function erf(x){ const t=1/(1+0.3275911*Math.abs(x));
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return x>=0?y:-y; }
+function lognCdf(x,mu,s){ if(x<=0)return 0; return 0.5*(1+erf((Math.log(x)-mu)/(s*Math.SQRT2))); }
+async function estimate(inp){
+  if(!USE_DB) return estimateLocal(inp);
+  try{
+    const gtq = inp.cur==='USD' ? inp.salary*USD_RATE : inp.salary;
+    const {data,error} = await sb.rpc('salary_insight', {
+      p_role:inp.role, p_seniority:inp.sen, p_exp:inp.exp, p_education:inp.edu,
+      p_location:inp.loc, p_industry:inp.ind, p_size:inp.size, p_total:gtq
+    });
+    if(error) throw error;
+    if(!data || data.median==null) return {...estimateLocal(inp), _lowdata:true};
+    const d=data, median=Number(d.median);
+    const sigma = (d.p84 && d.p16 && d.p16>0) ? Math.max(0.06, Math.log(d.p84/d.p16)/2) : 0.26;
+    return {
+      median, mu:Math.log(median), sigma,
+      p10:+d.p10, p25:+d.p25, p50:median, p75:+d.p75, p90:+d.p90, p16:+d.p16, p84:+d.p84,
+      userGTQ:gtq, userPct:+d.user_pct, n:Math.round(+d.n_effective), nRaw:+d.n_raw,
+      confidence:d.confidence, level:+d.level, dimsDropped:d.dims_dropped||[]
+    };
+  }catch(e){ console.warn('salary_insight falló, uso modelo local:', e.message||e); return estimateLocal(inp); }
+}
+function estimateLocal(inp){
+  const role = roleMeta(inp);
+  const dropOrder = ["ind","size","edu","exp","loc"]; // conservamos siempre rol + seniority
+  let kept = new Set(dropOrder);
+  const shareOf = {ind:IND.share, size:SIZE.share[inp.size], edu:EDU.share[inp.edu], exp:EXP.share[inp.exp], loc:LOC.share[inp.loc]};
+  const countN = ()=>{ let n=role.subs*SEN.share[inp.sen]; kept.forEach(d=> n*=shareOf[d]); return n; };
+  let dropped=[], n=countN();
+  for(const d of dropOrder){ if(n>=40) break; kept.delete(d); dropped.push(d); n=countN(); }
+  n = Math.round(n);
+
+  const skillPrem = 1 + Array.from(selectedSkills.values()).reduce((a,p)=>a+p, 0);
+  let median = role.base * SEN.mult[inp.sen] * skillPrem;
+  median *= kept.has("exp")? EXP.mult[inp.exp] : AVG.exp;
+  median *= kept.has("edu")? EDU.mult[inp.edu] : AVG.edu;
+  median *= kept.has("loc")? LOC.mult[inp.loc] : AVG.loc;
+  median *= kept.has("size")? SIZE.mult[inp.size] : AVG.size;
+  median *= kept.has("ind")? IND.mult[inp.ind] : AVG.ind;
+
+  const mu = Math.log(median);
+  const Q = z => median*Math.exp(SIGMA*z); // cuantil por z-score
+  const userGTQ = inp.cur==="USD"? inp.salary*USD_RATE : inp.salary;
+  return {
+    median, mu, sigma:SIGMA, n, kept, dropped, userGTQ,
+    p10:Q(-1.2816), p25:Q(-0.6745), p50:median, p75:Q(0.6745), p90:Q(1.2816),
+    userPct: Math.max(1, Math.min(99, Math.round(lognCdf(userGTQ,mu,SIGMA)*100)))
+  };
+}
+
+/* ================= UI ================= */
+function go(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// poblar selects + skills por rol
+(function init(){
+  const roleSel=document.getElementById('role');
+  Object.entries(ROLES).forEach(([k,v])=>{const o=document.createElement('option');o.value=k;o.textContent=v.label;roleSel.appendChild(o);});
+  const oOther=document.createElement('option'); oOther.value='__other__'; oOther.textContent='➕ Mi profesión no está en la lista'; roleSel.appendChild(oOther);
+  roleSel.addEventListener('change',()=>{
+    const other = roleSel.value==='__other__';
+    const ro=document.getElementById('roleOther');
+    ro.style.display = other ? '' : 'none';
+    if(other) ro.focus();
+    renderSkills(roleSel.value);
+  });
+  renderSkills(roleSel.value);
+  const curSel=document.getElementById('cur');
+  curSel.addEventListener('change',e=>{ document.getElementById('varCur').textContent = e.target.value==='USD'?'$ USD':'Q GTQ'; });
+  buildAvatars();
+  buildThread();
+  // Si regresa con sesión (enlace mágico / Google), registra su contacto (repositorio de correos)
+  if(USE_DB){ sb.auth.getSession().then(({data})=>{ const u=data&&data.session&&data.session.user; if(u) upsertContact(u); }).catch(()=>{}); }
+})();
+window.addEventListener('load',buildThread);
+let _thT; window.addEventListener('resize',()=>{clearTimeout(_thT);_thT=setTimeout(buildThread,250);});
+
+/* --- el hilo: laberinto que SURGE con el scroll, con bolita que avanza y nodos que se encienden --- */
+var THREAD=null, _thTick=false;
+function buildThread(){
+  const J=document.querySelector('.journey'), svg=document.getElementById('thread');
+  if(!J||!svg) return;
+  const jb=J.getBoundingClientRect();
+  const W=80, H=J.scrollHeight, cx=38, amp=26;
+  const how=J.querySelector('.howhead');
+  const straightY = how ? Math.max(60,(how.getBoundingClientRect().top - jb.top)) : H*0.72;
+
+  // Un solo trazo continuo: enredado arriba (amplitud/frecuencia que decaen) y recto abajo
+  let d=`M ${cx} 6`, y=6, dir=1;
+  while(y < straightY-6){
+    const t=Math.min(1, y/straightY);
+    const a=(1-t)*(1-t)*amp;
+    const seg=16 + t*t*70;
+    const nx=cx + dir*a;
+    d+=` L ${nx.toFixed(1)} ${y.toFixed(1)}`;
+    y=Math.min(straightY, y+seg);
+    d+=` L ${nx.toFixed(1)} ${y.toFixed(1)}`;
+    dir*=-1;
+  }
+  const endY=H-16;
+  d+=` L ${cx} ${straightY.toFixed(1)} L ${cx} ${endY.toFixed(1)}`;
+
+  const nodeYs=[];
+  J.querySelectorAll('.steps li').forEach(li=>{ nodeYs.push((li.getBoundingClientRect().top - jb.top) + li.offsetHeight/2); });
+
+  const gTeal=(straightY/H-0.008).toFixed(3), gAmb=(straightY/H+0.004).toFixed(3);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  let html=`<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="${H}" gradientUnits="userSpaceOnUse">`+
+    `<stop offset="0" stop-color="#0f766e"/><stop offset="${gTeal}" stop-color="#0f766e"/>`+
+    `<stop offset="${gAmb}" stop-color="#d97706"/><stop offset="1" stop-color="#d97706"/></linearGradient></defs>`+
+    `<circle cx="${cx}" cy="6" r="4" fill="#0f766e"/>`+
+    `<path id="threadPath" d="${d}" fill="none" stroke="url(#tg)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  nodeYs.forEach(ny=>{ html+=`<circle class="tnode-ring" cx="${cx}" cy="${ny.toFixed(1)}" r="11" fill="none" stroke="#d97706" stroke-width="1.5" opacity="0.22"/>`+
+    `<circle class="tnode" cx="${cx}" cy="${ny.toFixed(1)}" r="5.5" fill="#cbd5d3"/>`; });
+  html+=`<path id="threadArrow" d="M ${cx-6} ${endY-8} L ${cx} ${endY} L ${cx+6} ${endY-8}" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>`+
+    `<circle id="threadBall" r="7" fill="#d97706" stroke="#fff" stroke-width="2.5" opacity="0"/>`;
+  svg.innerHTML=html;
+
+  const pathEl=svg.querySelector('#threadPath');
+  const len=pathEl.getTotalLength();
+  pathEl.style.strokeDasharray=len;
+  const lenAtY=(ty)=>{let lo=0,hi=len;for(let k=0;k<22;k++){const mid=(lo+hi)/2;(pathEl.getPointAtLength(mid).y<ty)?lo=mid:hi=mid;}return (lo+hi)/2;};
+  const nodeEls=[...svg.querySelectorAll('.tnode')], ringEls=[...svg.querySelectorAll('.tnode-ring')];
+  const nodes=nodeEls.map((el,i)=>({el,ring:ringEls[i],frac:lenAtY(nodeYs[i])/len}));
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  THREAD={J,pathEl,len,ball:svg.querySelector('#threadBall'),arrow:svg.querySelector('#threadArrow'),nodes,reduce};
+
+  if(reduce){ pathEl.style.strokeDashoffset=0; nodes.forEach(n=>{n.el.setAttribute('fill','#d97706');n.ring.setAttribute('opacity','0.5');}); THREAD.arrow.setAttribute('opacity','1'); }
+  else { pathEl.style.strokeDashoffset=len; updateThread(); }
+}
+function updateThread(){
+  if(!THREAD||THREAD.reduce) return;
+  const {J,pathEl,len,ball,arrow,nodes}=THREAD;
+  const rect=J.getBoundingClientRect(), vh=window.innerHeight||800;
+  let p=(vh*0.62 - rect.top)/rect.height;
+  p=Math.max(0,Math.min(1,p));
+  pathEl.style.strokeDashoffset=len*(1-p);
+  const pt=pathEl.getPointAtLength(len*p);
+  ball.setAttribute('cx',pt.x.toFixed(1)); ball.setAttribute('cy',pt.y.toFixed(1));
+  ball.setAttribute('opacity', (p>0.004 && p<0.996)?'1':'0');
+  nodes.forEach(n=>{ const on=p>=n.frac-0.002; n.el.setAttribute('fill',on?'#d97706':'#cbd5d3'); n.ring.setAttribute('opacity',on?'0.5':'0.22'); });
+  arrow.setAttribute('opacity', p>0.98?'1':'0');
+}
+window.addEventListener('scroll',()=>{ if(_thTick)return; _thTick=true; requestAnimationFrame(()=>{_thTick=false;updateThread();}); },{passive:true});
+
+/* --- avatares animados (carrusel) --- */
+function avatarSVG(cfg,i){
+  const id='av'+i, S=cfg.skin, H=cfg.hair, B=cfg.bg, T=cfg.shirt;
+  let hair='';
+  if(cfg.style==='short') hair=`<path d="M25 44 a21 21 0 0 1 42 0 q-21 -8 -42 0 z" fill="${H}"/>`;
+  else if(cfg.style==='bun') hair=`<circle cx="46" cy="20" r="8" fill="${H}"/><path d="M25 44 a21 21 0 0 1 42 0 q-21 -10 -42 0 z" fill="${H}"/>`;
+  else if(cfg.style==='long') hair=`<rect x="22" y="38" width="9" height="42" rx="4" fill="${H}"/><rect x="61" y="38" width="9" height="42" rx="4" fill="${H}"/><path d="M24 45 a22 22 0 0 1 44 0 q-22 -11 -44 0 z" fill="${H}"/>`;
+  else if(cfg.style==='curly') hair=`<circle cx="30" cy="34" r="9" fill="${H}"/><circle cx="46" cy="29" r="10" fill="${H}"/><circle cx="62" cy="34" r="9" fill="${H}"/><path d="M25 44 a21 21 0 0 1 42 0 q-21 -8 -42 0 z" fill="${H}"/>`;
+  let head,eyes,mouth;
+  if(cfg.style==='hijab'){
+    head=`<path d="M18 46 a28 26 0 0 1 56 0 v34 h-56 z" fill="${H}"/><ellipse cx="46" cy="50" rx="16" ry="19" fill="${S}"/>`;
+    eyes=`<circle cx="40" cy="49" r="2" fill="#2b2b2b"/><circle cx="52" cy="49" r="2" fill="#2b2b2b"/>`;
+    mouth=`<path d="M41 56 q5 4 10 0" stroke="#5c3823" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  } else {
+    head=`<circle cx="46" cy="46" r="21" fill="${S}"/>`+hair;
+    eyes=`<circle cx="39" cy="46" r="2" fill="#333"/><circle cx="53" cy="46" r="2" fill="#333"/>`;
+    mouth=`<path d="M40 53 q6 5 12 0" stroke="#a86b45" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  }
+  return `<svg class="av" viewBox="0 0 92 92" aria-hidden="true"><clipPath id="${id}"><circle cx="46" cy="46" r="46"/></clipPath><g clip-path="url(#${id})"><rect x="0" y="0" width="92" height="92" fill="${B}"/><rect x="8" y="72" width="76" height="44" rx="22" fill="${T}"/>${head}${eyes}${mouth}</g></svg>`;
+}
+function buildAvatars(){
+  const cfgs=[
+    {bg:'#d9efe9',shirt:'#0f766e',skin:'#f2c9a0',hair:'#2b2b2b',style:'short'},
+    {bg:'#fdecd2',shirt:'#d97706',skin:'#a86f4b',hair:'#1a1a1a',style:'bun'},
+    {bg:'#e6eaea',shirt:'#17403b',skin:'#f4d3b0',hair:'#7a5230',style:'long'},
+    {bg:'#ece5f2',shirt:'#b45309',skin:'#7d4f34',hair:'#0b5a54',style:'hijab'},
+    {bg:'#d9efe9',shirt:'#33504b',skin:'#e8b48a',hair:'#d9a441',style:'short'},
+    {bg:'#fdecd2',shirt:'#0f766e',skin:'#8d5a3c',hair:'#141414',style:'curly'},
+    {bg:'#e6eaea',shirt:'#d97706',skin:'#f2c9a0',hair:'#5b3a22',style:'long'},
+    {bg:'#e0f0ec',shirt:'#b45309',skin:'#c98a5e',hair:'#2b2b2b',style:'bun'},
+    {bg:'#ece5f2',shirt:'#17403b',skin:'#f4d3b0',hair:'#8a6a3a',style:'short'},
+    {bg:'#fdecd2',shirt:'#33504b',skin:'#a86f4b',hair:'#111111',style:'curly'},
+  ];
+  const track=document.getElementById('avatarTrack');
+  const first=cfgs.map((c,i)=>avatarSVG(c,i)).join('');
+  const second=cfgs.map((c,i)=>avatarSVG(c,i+100)).join('');
+  track.innerHTML=first+second;
+}
+
+/* --- enlaces del footer --- */
+const INFO={
+  como:{t:'Cómo funciona',h:'Cuéntanos tu perfil (rol, experiencia, habilidades), te mostramos tu percentil en el mercado y recomendaciones para mejorar. Cada respuesta anónima afina el modelo — sin intervención humana.'},
+  faq:{t:'Preguntas frecuentes',h:'<div class="faq"><b>¿Es anónimo?</b>Sí. No pedimos tu nombre y solo mostramos rangos agregados.<b>¿Cuánto cuesta?</b>Gratis para siempre para las personas.<b>¿De dónde salen los datos?</b>De las respuestas de la comunidad, más fuentes públicas de referencia.<b>¿Puedo confiar en el rango?</b>Mientras más gente responde, más preciso. Siempre te mostramos el nivel de confianza.</div>'},
+  goal:{t:'Nuestra misión',h:'Creemos que saber cuánto vale tu trabajo no debería ser un secreto. Nuestra meta es llevar transparencia salarial a Guatemala para que cada persona negocie con datos —no a ciegas— y para que el mercado laboral sea más justo.'},
+  contact:{t:'Contáctanos',h:'¿Dudas, alianzas o prensa? Escríbenos a <a href="mailto:hola@salariojusto.com">hola@salariojusto.com</a>.'},
+  terms:{t:'Términos y condiciones',h:'Este es un prototipo con datos ficticios. Los términos definitivos se publicarán antes del lanzamiento. El uso será gratuito para las personas y los datos se tratarán de forma anónima y agregada.'},
+  privacy:{t:'Privacidad',h:'Tus respuestas son anónimas. No almacenamos datos que te identifiquen y solo publicamos rangos de 5 o más personas. Podrás borrar tu información cuando quieras.'},
+};
+function openInfo(k){const d=INFO[k];if(!d)return;document.getElementById('modalTitle').textContent=d.t;document.getElementById('modalBody').innerHTML=d.h;document.getElementById('modalBg').classList.add('on');}
+
+function renderSkills(role){
+  selectedSkills.clear();
+  const box=document.getElementById('skills'); box.innerHTML='';
+  (SKILLS_BY_ROLE[role]||GENERIC_SKILLS).forEach(s=>addChip(s.l,s.p,box));
+  updateSkillHint();
+}
+function addChip(label,prem,box){
+  box = box||document.getElementById('skills');
+  const c=document.createElement('div'); c.className='chip'; c.textContent=label; c.dataset.label=label;
+  c.onclick=()=>toggleSkill(label,prem,c);
+  box.appendChild(c); return c;
+}
+function toggleSkill(label,prem,c){
+  if(selectedSkills.has(label)){ selectedSkills.delete(label); c.classList.remove('on'); }
+  else{ if(selectedSkills.size>=MAX_SKILLS){ flashHint(); return; } selectedSkills.set(label,prem); c.classList.add('on'); }
+  updateSkillHint();
+}
+function addCustomSkill(){
+  const inp=document.getElementById('customSkill'); const v=(inp.value||'').trim();
+  if(!v) return;
+  if(selectedSkills.size>=MAX_SKILLS){ flashHint(); return; }
+  // evita duplicados
+  const exists=[...document.querySelectorAll('#skills .chip')].find(c=>c.dataset.label.toLowerCase()===v.toLowerCase());
+  const chip = exists || addChip(v, .04);
+  if(!selectedSkills.has(chip.dataset.label)) toggleSkill(chip.dataset.label,.04,chip);
+  inp.value='';
+}
+function updateSkillHint(){
+  const h=document.getElementById('skillHint');
+  if(h) h.textContent=`${selectedSkills.size}/${MAX_SKILLS}`;
+}
+function flashHint(){ const h=document.getElementById('skillHint'); if(!h)return; h.style.color='#c0392b'; setTimeout(()=>h.style.color='',700); }
+
+function fmt(gtq,cur){
+  const v = cur==="USD"? gtq/USD_RATE : gtq;
+  const sym = cur==="USD"? "$" : "Q";
+  return sym + round100(v).toLocaleString('es-GT');
+}
+
+function segDescription(st,inp){
+  const parts = [roleMeta(inp).label, SEN.label[inp.sen]];
+  if(st.kept.has("loc")) parts.push(LOC.label[inp.loc]);
+  if(st.kept.has("exp")) parts.push(EXP.label[inp.exp]);
+  if(st.kept.has("edu")) parts.push(EDU.label[inp.edu]);
+  if(st.kept.has("size")) parts.push(SIZE.label[inp.size]);
+  if(st.kept.has("ind")) parts.push(IND.label[inp.ind]);
+  return parts.join(" · ");
+}
+
+async function compute(){
+  const roleVal=val('role');
+  const roleCustom = roleVal==='__other__' ? (document.getElementById('roleOther').value||'').trim() : '';
+  if(roleVal==='__other__' && !roleCustom){ openModal("Falta tu profesión","Escribe tu profesión para continuar. (Es anónimo.)"); return; }
+  const base=parseFloat(document.getElementById('salary').value);
+  const variable=parseFloat(document.getElementById('variable').value)||0;
+  const inp={
+    role:roleVal, roleCustom, sen:val('sen'),exp:val('exp'),edu:val('edu'),
+    loc:val('loc'),ind:val('ind'),size:val('size'),cur:val('cur'),
+    prest:document.getElementById('prest').checked,
+    base, variable, salary:(base||0)+variable
+  };
+  if(!base||base<=0){ openModal("Falta tu salario base","Ingresa tu salario base mensual para calcular tu posición. (Es anónimo.)"); return; }
+  const btn=document.querySelector('#formCard .cta'); if(btn){ btn.disabled=true; btn.dataset.txt=btn.innerHTML; btn.innerHTML='Calculando…'; }
+  const st = await estimate(inp);
+  if(btn){ btn.disabled=false; btn.innerHTML=btn.dataset.txt; }
+  LAST = { st, inp };
+  go('login');                 // primero preguntamos si quiere iniciar sesión
+}
+function val(id){return document.getElementById(id).value;}
+function showVar(){ document.getElementById('varToggle').style.display='none'; document.getElementById('varField').style.display=''; document.getElementById('variable').focus(); }
+function hideVar(){ document.getElementById('varField').style.display='none'; document.getElementById('varToggle').style.display=''; document.getElementById('variable').value=''; }
+
+/* --- navegación del flujo --- */
+function scrollToForm(){ const f=document.getElementById('formCard'); if(f) f.scrollIntoView({behavior:'smooth',block:'start'}); }
+function editProfile(){ go('landing'); setTimeout(scrollToForm,80); }
+async function loginWith(p){
+  if(!USE_DB){ proceedToResults(); return; }   // modo demo sin backend
+  try{
+    if(p==='correo'){
+      const email=(document.getElementById('loginEmail').value||'').trim();
+      if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ openModal('Revisa tu correo','Escribe un correo válido para enviarte el enlace.'); return; }
+      const {error}=await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
+      if(error) throw error;
+      openModal('Revisa tu correo','Te enviamos un enlace para entrar. Mientras tanto, aquí tienes tu resultado.');
+      proceedToResults(); return;
+    }
+    if(p==='Google'){ const {error}=await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.href.split('#')[0] } }); if(error) throw error; return; }
+    if(p==='teléfono'){ openModal('Muy pronto','El ingreso por teléfono se activa en la siguiente versión.'); return; }
+  }catch(e){ openModal('Ups', (e.message||'No se pudo iniciar sesión')+'. Puedes ver tu resultado sin cuenta.'); }
+}
+function proceedToResults(){ if(!LAST.st) return; recordSubmission(LAST.inp); render(LAST.st, LAST.inp); go('result'); }
+
+/* --- registrar el envío para alimentar el modelo (dedup si hay sesión) --- */
+let _recorded=false;
+async function recordSubmission(inp){
+  if(!USE_DB || _recorded) return; _recorded=true;
+  try{
+    const g = v => inp.cur==='USD' ? v*USD_RATE : v;
+    const { data:{ user } } = await sb.auth.getUser();
+    const row = {
+      role: inp.role, seniority: inp.sen, exp_band: inp.exp, education: inp.edu,
+      location: inp.loc, industry: inp.ind, company_size: inp.size,
+      base_salary: Math.round(g(inp.base)), variable: Math.round(g(inp.variable||0)),
+      total_comp: Math.round(g(inp.salary)), currency:'GTQ',
+      has_benefits: !!inp.prest, skills:[...selectedSkills.keys()],
+      contributor_id: user ? user.id : null
+    };
+    if(user){ await sb.from('submissions').upsert(row,{onConflict:'contributor_id'}); await upsertContact(user); }
+    else { await sb.from('submissions').insert(row); }
+  }catch(e){ console.warn('No se pudo registrar el envío:', e.message||e); }
+}
+async function upsertContact(user){
+  try{
+    const enc=new TextEncoder().encode((user.email||'').trim().toLowerCase());
+    const buf=await crypto.subtle.digest('SHA-256', enc);
+    const hash=[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    await sb.from('contacts').upsert({ id:user.id, email_hash:hash },{ onConflict:'id' });
+  }catch(e){}
+}
+
+/* --- recomendaciones basadas en datos --- */
+const NEXT_EDU={hs:'tech',tech:'bach',bach:'master'};
+const NEXT_SEN={junior:'mid',mid:'senior',senior:'lead',lead:'manager'};
+const NEXT_EXP={'0-2':'3-5','3-5':'6-10','6-10':'10+'};
+const EDU_RECO={tech:'una carrera técnica',bach:'una licenciatura',master:'una maestría o posgrado'};
+function personalMedian(o){
+  const rb = (o.role==='__other__') ? DEFAULT_ROLE.base : ROLES[o.role].base;
+  return rb*SEN.mult[o.sen]*EXP.mult[o.exp]*EDU.mult[o.edu]*LOC.mult[o.loc]*SIZE.mult[o.size]*IND.mult[o.ind]*o.skillPrem;
+}
+function recommendations(inp){
+  const skillPrem=1+Array.from(selectedSkills.values()).reduce((a,p)=>a+p,0);
+  const base={role:inp.role,sen:inp.sen,exp:inp.exp,edu:inp.edu,loc:inp.loc,size:inp.size,ind:inp.ind,skillPrem};
+  const baseMed=personalMedian(base);
+  const recs=[];
+  if(NEXT_EDU[inp.edu]){ const up=personalMedian({...base,edu:NEXT_EDU[inp.edu]})-baseMed;
+    recs.push({ic:'🎓',title:`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`,detail:`Subir tu nivel educativo eleva el rango de tu perfil.`,up}); }
+  if(NEXT_SEN[inp.sen]){ const up=personalMedian({...base,sen:NEXT_SEN[inp.sen]})-baseMed;
+    recs.push({ic:'↗',title:`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`,detail:`El salto de nivel es el mayor impulsor del salario.`,up}); }
+  if(NEXT_EXP[inp.exp]){ const up=personalMedian({...base,exp:NEXT_EXP[inp.exp]})-baseMed;
+    recs.push({ic:'⏳',title:`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`,detail:`Cada tramo de experiencia mueve el rango hacia arriba.`,up}); }
+  if(inp.size!=='multi'){ const up=personalMedian({...base,size:'multi'})-baseMed;
+    recs.push({ic:'🏢',title:`Apunta a empresas grandes o multinacionales`,detail:`Suelen pagar por encima del promedio para tu perfil.`,up}); }
+  const chosen=new Set([...selectedSkills.keys()].map(s=>s.toLowerCase()));
+  (SKILLS_BY_ROLE[inp.role]||GENERIC_SKILLS).filter(s=>!chosen.has(s.l.toLowerCase())).sort((a,b)=>b.p-a.p).slice(0,2).forEach(s=>{
+    const up=baseMed*(s.p/skillPrem);
+    const cert=/certif|pmp|niif|cloud|aws|colegiad|especialidad|revit|bim|sap|scrum/i.test(s.l);
+    recs.push({ic:cert?'📜':'✳',title:`${cert?'Certifícate en':'Domina'} ${s.l}`,detail:`Habilidad muy valorada para ${roleMeta(inp).label.toLowerCase()}.`,up});
+  });
+  recs.sort((a,b)=>b.up-a.up);
+  return { recs:recs.filter(r=>r.up>50).slice(0,4), targetP90:personalMedian({...base,sen:NEXT_SEN[inp.sen]||inp.sen}) };
+}
+async function renderRecos(inp){
+  const box=document.getElementById('recos'), foot=document.getElementById('recoFoot');
+  box.innerHTML=''; foot.textContent='Calculando…';
+  let recs;
+  try{ recs = USE_DB ? await recommendationsDB(inp) : recommendations(inp).recs; }
+  catch(e){ recs = recommendations(inp).recs; }
+  box.innerHTML='';
+  if(!recs.length){ foot.textContent='Tu perfil ya es muy competitivo — pocas palancas quedan. ¡Bien hecho!'; return; }
+  recs.forEach(r=>{
+    const li=document.createElement('li'); li.className='reco';
+    li.innerHTML=`<span class="ic">${r.ic}</span><div class="body"><b>${r.title}</b><span>${r.detail}</span></div><span class="up">+${fmt(r.up,inp.cur)}/mes</span>`;
+    box.appendChild(li);
+  });
+  foot.textContent='Estimaciones según cómo cambia el salario de perfiles similares. Referencial, no es garantía.';
+}
+// Recomendaciones basadas en datos reales: compara la mediana del mercado
+// para el mismo perfil con una palanca mejorada (educación, nivel, experiencia, empresa).
+async function recommendationsDB(inp){
+  const base = await estimate(inp);
+  const baseMed = base.median || 0;
+  const levers = [];
+  if(NEXT_EDU[inp.edu]) levers.push({ic:'🎓', title:`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`, detail:'Subir tu nivel educativo eleva el rango del mercado.', mut:{edu:NEXT_EDU[inp.edu]}});
+  if(NEXT_SEN[inp.sen]) levers.push({ic:'↗', title:`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`, detail:'El salto de nivel es el mayor impulsor del salario.', mut:{sen:NEXT_SEN[inp.sen]}});
+  if(NEXT_EXP[inp.exp]) levers.push({ic:'⏳', title:`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`, detail:'Cada tramo de experiencia mueve el rango hacia arriba.', mut:{exp:NEXT_EXP[inp.exp]}});
+  if(inp.size!=='multi') levers.push({ic:'🏢', title:'Apunta a empresas grandes o multinacionales', detail:'Suelen pagar por encima del promedio para tu perfil.', mut:{size:'multi'}});
+  const out = await Promise.all(levers.map(async l=>{
+    const st2 = await estimate({...inp, ...l.mut});
+    return { ic:l.ic, title:l.title, detail:l.detail, up:(st2.median||baseMed)-baseMed };
+  }));
+  return out.filter(r=>r.up>50).sort((a,b)=>b.up-a.up).slice(0,4);
+}
+
+function render(st,inp){
+  const cur=inp.cur;
+  // percentil + números clave (lean)
+  // 1) Lo que paga el mercado por este perfil — rango = ±1 desviación estándar (~68% de la gente)
+  const lo1=st.median*Math.exp(-st.sigma), hi1=st.median*Math.exp(st.sigma);
+  document.getElementById('marketLine').innerHTML =
+    `El mercado paga por este perfil entre <b>${fmt(lo1,cur)}</b> y <b>${fmt(hi1,cur)}</b> al mes, con una mediana de <b>${fmt(st.p50,cur)}</b>.`;
+
+  // 2) Tu posición, en lenguaje simple
+  const vb=document.getElementById('verdictBig'), vs=document.getElementById('verdictSub');
+  const per10=v=>Math.min(9,Math.max(1,Math.round(v/10)));
+  const moreThanYou=100-st.userPct;
+  if(st.userPct>=55){
+    vb.innerHTML=`Según tu salario, estás <b>por encima</b> del mercado.`;
+    vs.textContent=`Solo ${per10(moreThanYou)} de cada 10 personas con tu perfil ganan más que tú.`;
+  } else if(st.userPct<=45){
+    vb.innerHTML=`Según tu salario, estás <b>por debajo</b> del mercado.`;
+    vs.textContent=`${per10(moreThanYou)} de cada 10 personas con tu perfil ganan más que tú.`;
+  } else {
+    vb.innerHTML=`Según tu salario, estás <b>en el promedio</b> del mercado.`;
+    vs.textContent=`Cerca de la mitad gana más que tú y la otra mitad menos.`;
+  }
+
+  // 3) Números clave
+  document.getElementById('medVal').textContent = fmt(st.p50,cur);
+  document.getElementById('youVal').textContent = fmt(st.userGTQ,cur);
+  const toGTQ=v=> cur==='USD'? v*USD_RATE : v;
+  document.getElementById('youBreak').textContent = (inp.variable>0)
+    ? `Base ${fmt(toGTQ(inp.base),cur)} + variable ${fmt(toGTQ(inp.variable),cur)}` : '';
+
+  // 4) Resumen del perfil (incluye prestaciones de ley)
+  document.getElementById('profileSum').innerHTML = profileChips(inp);
+
+  // confianza (breve)
+  const pill=document.getElementById('confPill'), ct=document.getElementById('confText');
+  let lvl,cls;
+  if(st.n>=100){lvl="Confianza alta";cls="alta";}
+  else if(st.n>=30){lvl="Confianza media";cls="media";}
+  else {lvl="Confianza baja";cls="baja";}
+  pill.textContent=lvl; pill.className='pill '+cls;
+  const nShow = (st.nRaw!=null ? st.nRaw : st.n);
+  ct.textContent = (st.confidence==='insuficiente' || nShow<5)
+    ? `Pocos datos aún — este perfil se ocultaría hasta reunir 5+ respuestas.`
+    : `Basado en ~${nShow} perfiles similares.`;
+
+  renderRecos(inp);
+  drawCurve(st,inp);
+}
+
+/* ---- resumen del perfil como chips ---- */
+function profileChips(inp){
+  const parts=[roleMeta(inp).label, SEN.label[inp.sen], EXP.label[inp.exp], EDU.label[inp.edu], LOC.label[inp.loc], IND.label[inp.ind], SIZE.label[inp.size]];
+  [...selectedSkills.keys()].forEach(s=>parts.push(s));
+  parts.push(inp.prest?'✓ Prestaciones de ley':'✕ Sin prestaciones de ley');
+  return parts.map(p=>`<span class="psum-chip">${p}</span>`).join('');
+}
+
+/* ---- curva suave (densidad lognormal) ---- */
+function drawCurve(st,inp){
+  const W=560,H=300,padL=14,padR=14,padT=36,padB=32;
+  document.getElementById('chart').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const x0=padL,x1=W-padR,y0=padT,y1=H-padB;
+  const {mu,sigma}=st;
+  const lo=Math.exp(mu-2.6*sigma), hi=Math.exp(mu+2.6*sigma), span=hi-lo;
+  const bx=v=>x0+((v-lo)/span)*(x1-x0);
+  const pdf=x=> x<=0?0 : Math.exp(-Math.pow(Math.log(x)-mu,2)/(2*sigma*sigma))/(x*sigma);
+  const N=140, xs=[]; let maxP=0;
+  for(let i=0;i<=N;i++){ const x=lo+span*i/N; const p=pdf(x); xs.push([x,p]); if(p>maxP)maxP=p; }
+  const by=p=>y1-(p/maxP)*(y1-y0);
+  let d=`M ${x0} ${y1} `;
+  xs.forEach(([x,p])=>{ d+=`L ${bx(x).toFixed(1)} ${by(p).toFixed(1)} `; });
+  d+=`L ${x1} ${y1} Z`;
+
+  const medX=bx(st.median);
+  const userX=Math.max(x0,Math.min(x1,bx(st.userGTQ)));
+  const svg=`
+    <defs><linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#14b8a6" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#14b8a6" stop-opacity="0.04"/>
+    </linearGradient></defs>
+    <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="#e3e9ea" stroke-width="1"/>
+    <path d="${d}" fill="url(#grad)" stroke="#0f766e" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="${medX}" y1="${y0-2}" x2="${medX}" y2="${y1}" stroke="#0b5a54" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <text x="${medX}" y="${y1+18}" font-size="11" fill="#0b5a54" text-anchor="middle" font-weight="700">Mediana</text>
+    <line x1="${userX}" y1="${y0-12}" x2="${userX}" y2="${y1}" stroke="#d97706" stroke-width="2.5"/>
+    <circle cx="${userX}" cy="${y0-12}" r="5.5" fill="#d97706"/>
+    <text x="${userX}" y="${y0-20}" font-size="11.5" fill="#92500a" text-anchor="middle" font-weight="800">Tú</text>
+  `;
+  document.getElementById('chart').innerHTML=svg;
+}
+
+/* ---- auth mockup + modal ---- */
+function mockAuth(p){openModal("Prototipo",`En la versión real inicias sesión con ${p}.`);}
+function openModal(t,b){document.getElementById('modalTitle').textContent=t;document.getElementById('modalBody').textContent=b;document.getElementById('modalBg').classList.add('on');}
+function closeModal(e){if(e&&e.target&&e.target.id!=='modalBg'&&e.type==='click')return;document.getElementById('modalBg').classList.remove('on');}
+</script>
+</body>
+</html>

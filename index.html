@@ -112,6 +112,18 @@
   .skillbox{margin-top:2px}
   .skillcat{margin-bottom:12px}
   .skillcat h5{margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.8}
+  .ad-card{margin-top:16px}
+  .ad-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .ad-tag{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+  .ad-slot{display:grid;gap:10px}
+  .ad-item{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fbfcfc;text-decoration:none;color:inherit;transition:all .12s}
+  .ad-item:hover{border-color:var(--teal);background:var(--teal-soft)}
+  .ad-logo{width:44px;height:44px;flex:none;border-radius:11px;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}
+  .ad-body{flex:1;min-width:0}
+  .ad-body b{display:block;font-size:15px}
+  .ad-body span{font-size:13px;color:var(--muted)}
+  .ad-cta{font-size:13px;font-weight:800;color:var(--teal);white-space:nowrap}
+  .ad-house{border-style:dashed;background:transparent}
   .chip{border:1px solid var(--line);background:#fbfcfc;padding:8px 13px;border-radius:999px;font-size:13.5px;cursor:pointer;user-select:none;font-weight:600;color:var(--muted);transition:all .12s}
   .chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
   .full{grid-column:1/-1}
@@ -339,13 +351,13 @@
           <input id="roleOther" type="text" placeholder="Escribe tu profesión" maxlength="40" style="display:none;margin-top:8px">
         </div>
         <div class="field">
-          <label class="lbl">Nivel / seniority</label>
+          <label class="lbl">Nivel de la plaza</label>
           <select id="sen">
-            <option value="junior">Junior</option>
-            <option value="mid" selected>Semi-senior</option>
-            <option value="senior">Senior</option>
-            <option value="lead">Líder / Jefe</option>
-            <option value="manager">Gerente</option>
+            <option value="junior">Nivel 1 · Operativo / apoyo</option>
+            <option value="mid" selected>Nivel 2 · Profesional o Supervisor</option>
+            <option value="senior">Nivel 3 · Especialista / Sr. o Jefatura</option>
+            <option value="lead">Nivel 4 · Experto líder o Gerencia</option>
+            <option value="manager">Nivel 5 · Dirección / C-level</option>
           </select>
           <div class="hint" id="senHint"></div>
         </div>
@@ -363,7 +375,8 @@
           <select id="edu">
             <option value="hs">Diversificado / bachillerato</option>
             <option value="tech">Técnico</option>
-            <option value="bach" selected>Licenciatura</option>
+            <option value="lic_proc">Licenciatura en proceso</option>
+            <option value="bach" selected>Licenciatura terminada</option>
             <option value="master">Maestría o más</option>
           </select>
         </div>
@@ -371,10 +384,27 @@
           <label class="lbl">Departamento</label>
           <select id="loc">
             <option value="gt" selected>Guatemala</option>
-            <option value="sac">Sacatepéquez</option>
-            <option value="xela">Quetzaltenango</option>
+            <option value="averapaz">Alta Verapaz</option>
+            <option value="bverapaz">Baja Verapaz</option>
+            <option value="chim">Chimaltenango</option>
+            <option value="chiqui">Chiquimula</option>
+            <option value="progreso">El Progreso</option>
             <option value="esc">Escuintla</option>
-            <option value="otro">Otro departamento</option>
+            <option value="hue">Huehuetenango</option>
+            <option value="izabal">Izabal</option>
+            <option value="jalapa">Jalapa</option>
+            <option value="jutiapa">Jutiapa</option>
+            <option value="peten">Petén</option>
+            <option value="xela">Quetzaltenango</option>
+            <option value="quiche">Quiché</option>
+            <option value="reu">Retalhuleu</option>
+            <option value="sac">Sacatepéquez</option>
+            <option value="sanmarcos">San Marcos</option>
+            <option value="srosa">Santa Rosa</option>
+            <option value="solola">Sololá</option>
+            <option value="such">Suchitepéquez</option>
+            <option value="toto">Totonicapán</option>
+            <option value="zacapa">Zacapa</option>
           </select>
         </div>
         <div class="field">
@@ -410,8 +440,8 @@
             <option value="micro">Micro (1–10)</option>
             <option value="peq">Pequeña (11–50)</option>
             <option value="med" selected>Mediana (51–200)</option>
-            <option value="grande">Grande (200+)</option>
-            <option value="multi">Multinacional</option>
+            <option value="grande">Grande (200–1,000)</option>
+            <option value="multi">Muy grande (1,000+)</option>
           </select>
         </div>
         <div class="field">
@@ -433,7 +463,7 @@
           <div class="hint">Para trabajos con base baja y comisión alta. Usa un promedio mensual.</div>
         </div>
         <div class="field full">
-          <label class="lbl">Habilidades <span class="opt">(elige hasta 5, las más elegidas primero) · <span id="skillHint">0/5</span></span></label>
+          <label class="lbl">Habilidades <span class="opt">(top 10 para tu puesto · elige hasta 5 o agrega la tuya) · <span id="skillHint">0/5</span></span></label>
           <div id="skills" class="skillbox"></div>
           <div class="addskill">
             <input id="customSkill" type="text" placeholder="Agregar otra…" maxlength="26"
@@ -450,6 +480,7 @@
         </div>
       </div>
       <div class="formfoot">
+        <div id="cfTurnstile" style="margin-bottom:10px"></div>
         <button class="cta" onclick="compute()">Ver mi resultado &nbsp;→</button>
       </div>
     </div>
@@ -526,6 +557,15 @@
       <p class="reco-foot" id="recoFoot"></p>
     </div>
 
+    <!-- Espacio patrocinado (nativo) — reclutadores / empresas -->
+    <div class="card ad-card" id="adCard">
+      <div class="ad-head">
+        <span class="eyebrow">Empresas que buscan tu perfil</span>
+        <span class="ad-tag">Patrocinado</span>
+      </div>
+      <div id="adSlot" class="ad-slot"></div>
+    </div>
+
     <div class="btnrow">
       <button class="secondary" onclick="go('landing')">← Volver al inicio</button>
     </div>
@@ -570,6 +610,7 @@
 <div class="proto-tag">PROTOTIPO · datos ficticios</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
 /* ============================================================
    CONFIG SUPABASE
@@ -581,6 +622,9 @@ const SUPABASE_URL      = 'https://pjxigifpvljaurccwler.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqeGlnaWZwdmxqYXVyY2N3bGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MDE5NzQsImV4cCI6MjEwMTk3Nzk3NH0.zne-d4Y0ce6dG7z5i-FtblXAOyETpT2668vNsTT5syo';
 const USE_DB = /^https:\/\/[a-z0-9-]+\.supabase\.co/.test(SUPABASE_URL) && (SUPABASE_ANON_KEY||'').length > 20;
 const sb = (USE_DB && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+// Cloudflare Turnstile (anti-bot invisible). Site key es público. La verificación real
+// ocurre en /api/verify con el Secret key (variable de entorno en Vercel). Vacío => desactivado.
+const TURNSTILE_SITEKEY = '0x4AAAAAAEPeNs0h4tp1p3xt';
 </script>
 <script>
 /* ============================================================
@@ -603,19 +647,24 @@ const ROLES = {
   cc:       {label:"Servicio al Cliente / Call",   base:5500,  subs:260},
 };
 
-const SEN  = {mult:{junior:.7,mid:1,senior:1.5,lead:2,manager:2.4}, share:{junior:.30,mid:.38,senior:.22,lead:.07,manager:.03}, label:{junior:"Junior",mid:"Semi-senior",senior:"Senior",lead:"Líder",manager:"Gerente"}};
+const SEN  = {mult:{junior:.7,mid:1,senior:1.5,lead:2,manager:2.4}, share:{junior:.30,mid:.38,senior:.22,lead:.07,manager:.03}, label:{junior:"Nivel 1 · Operativo",mid:"Nivel 2 · Profesional/Supervisor",senior:"Nivel 3 · Especialista/Jefatura",lead:"Nivel 4 · Experto/Gerencia",manager:"Nivel 5 · Dirección"}};
 const EXP  = {mult:{"0-2":.9,"3-5":1,"6-10":1.15,"10+":1.28}, share:{"0-2":.30,"3-5":.35,"6-10":.25,"10+":.10}, label:{"0-2":"0–2 años","3-5":"3–5 años","6-10":"6–10 años","10+":"10+ años"}};
-const EDU  = {mult:{hs:.85,tech:.95,bach:1,master:1.2}, share:{hs:.15,tech:.25,bach:.45,master:.15}, label:{hs:"Bachillerato",tech:"Técnico",bach:"Licenciatura",master:"Maestría+"}};
-const LOC  = {mult:{gt:1,sac:.95,xela:.8,esc:.88,otro:.75}, share:{gt:.55,sac:.08,xela:.12,esc:.05,otro:.20}, label:{gt:"Guatemala",sac:"Sacatepéquez",xela:"Quetzaltenango",esc:"Escuintla",otro:"Interior"}};
-const SIZE = {mult:{micro:.8,peq:.9,med:1,grande:1.2,multi:1.45}, share:{micro:.2,peq:.3,med:.3,grande:.15,multi:.05}, label:{micro:"Micro",peq:"Pequeña",med:"Mediana",grande:"Grande",multi:"Multinacional"}};
+const EDU  = {mult:{hs:.85,tech:.95,lic_proc:.97,bach:1,master:1.2}, share:{hs:.15,tech:.22,lic_proc:.13,bach:.35,master:.15}, label:{hs:"Bachillerato",tech:"Técnico",lic_proc:"Lic. en proceso",bach:"Licenciatura",master:"Maestría+"}};
+const LOC  = {
+  mult:{gt:1,averapaz:.75,bverapaz:.75,chim:.82,chiqui:.76,progreso:.78,esc:.88,hue:.74,izabal:.82,jalapa:.74,jutiapa:.76,peten:.80,xela:.85,quiche:.74,reu:.78,sac:.95,sanmarcos:.76,srosa:.78,solola:.76,such:.78,toto:.74,zacapa:.78,otro:.75},
+  share:{gt:.505,averapaz:.03,bverapaz:.01,chim:.03,chiqui:.012,progreso:.012,esc:.05,hue:.025,izabal:.02,jalapa:.012,jutiapa:.015,peten:.025,xela:.07,quiche:.02,reu:.015,sac:.05,sanmarcos:.025,srosa:.015,solola:.015,such:.02,toto:.012,zacapa:.012,otro:.02},
+  label:{gt:"Guatemala",averapaz:"Alta Verapaz",bverapaz:"Baja Verapaz",chim:"Chimaltenango",chiqui:"Chiquimula",progreso:"El Progreso",esc:"Escuintla",hue:"Huehuetenango",izabal:"Izabal",jalapa:"Jalapa",jutiapa:"Jutiapa",peten:"Petén",xela:"Quetzaltenango",quiche:"Quiché",reu:"Retalhuleu",sac:"Sacatepéquez",sanmarcos:"San Marcos",srosa:"Santa Rosa",solola:"Sololá",such:"Suchitepéquez",toto:"Totonicapán",zacapa:"Zacapa",otro:"Interior"}
+};
+const SIZE = {mult:{micro:.8,peq:.9,med:1,grande:1.2,multi:1.45}, share:{micro:.2,peq:.3,med:.3,grande:.15,multi:.05}, label:{micro:"Micro",peq:"Pequeña",med:"Mediana",grande:"Grande (200–1000)",multi:"Muy grande (1000+)"}};
 const IND  = {mult:{tech:1.15,fin:1.2,manu:1,com:.9,salud:1.05,edu:.85,tel:1.1,serv:.95,gob:.92,agro:.9,constr:1.0,turismo:.85,bpo:.95,transp:.95,legal:1.1,seguros:1.05,farma:1.1,alim:.95,energia:1.15,medios:.95,otro:1,__other__:1}, share:0.11, label:{tech:"Tecnología",fin:"Finanzas",manu:"Manufactura",com:"Comercio",salud:"Salud",edu:"Educación",tel:"Telecom",serv:"Servicios",gob:"Gobierno/ONG",agro:"Agroindustria",constr:"Construcción",turismo:"Turismo",bpo:"Call center/BPO",transp:"Transporte/logística",legal:"Legal",seguros:"Seguros",farma:"Farmacéutica",alim:"Alimentos y bebidas",energia:"Energía / minería",medios:"Medios / publicidad",otro:"Otra"}};
 // Definiciones de nivel (por alcance/responsabilidad, NO por edad ni años — eso se pregunta aparte)
+// Escala de un solo nivel con dos vías: por gente a cargo (management) o por dominio técnico (especialista).
 const SEN_DEF = {
-  junior:"Ejecutas tareas con supervisión. Estás aprendiendo el puesto.",
-  mid:"Trabajas de forma autónoma en lo tuyo; ya no necesitas guía constante.",
-  senior:"Dominas tu área y resuelves problemas complejos. Otros te consultan.",
-  lead:"Coordinas o guías a un equipo, aunque no seas el jefe formal.",
-  manager:"Diriges un área o equipo y respondes por sus resultados."
+  junior:"Ejecutas tareas siguiendo instrucciones. No tienes gente a cargo.",
+  mid:"Trabajas de forma autónoma en tu especialidad, o supervisas a operativos.",
+  senior:"Eres referente técnico sin gente a cargo, o supervisas a supervisores/jefes.",
+  lead:"Máxima autoridad técnica en tu campo, o diriges a gerentes y jefes.",
+  manager:"Diriges la organización o un área grande; respondes ante dueños o junta."
 };
 
 // ---- Catálogo de habilidades (largo, por categoría, relevante a puesto + industria) ----
@@ -721,6 +770,7 @@ function skillShown(s, role, ind){
 function skillsFor(role, ind){ return SKILL_CATALOG.filter(s=>skillShown(s,role,ind)); }
 let skillEng = {};            // {label: veces elegida} — engagement global
 const engCache = {};          // cache por rol
+SKILL_CATALOG.forEach(s=>{ s.rnd = Math.random(); });  // orden aleatorio ESTABLE por sesión (para el desempate)
 const MAX_SKILLS = 5;
 const USD_RATE = 7.8;
 let selectedSkills = new Map(); // label -> prem
@@ -756,9 +806,10 @@ async function estimate(inp){
   if(!USE_DB) return estimateLocal(inp);
   try{
     const gtq = inp.cur==='USD' ? inp.salary*USD_RATE : inp.salary;
+    const fp = await getFingerprint();
     const {data,error} = await sb.rpc('salary_insight', {
       p_role:inp.role, p_seniority:inp.sen, p_exp:inp.exp, p_education:inp.edu,
-      p_location:inp.loc, p_industry:inp.ind, p_size:inp.size, p_total:gtq
+      p_location:inp.loc, p_industry:inp.ind, p_size:inp.size, p_total:gtq, p_fp:fp
     });
     if(error) throw error;
     if(data && data.limited) return { limited:true, used:data.used, daily_limit:data.daily_limit, is_anon:data.is_anon };
@@ -838,7 +889,8 @@ function go(id){
   curSel.addEventListener('change',e=>{ document.getElementById('varCur').textContent = e.target.value==='USD'?'$ USD':'Q GTQ'; });
   buildAvatars();
   buildThread();
-  if(USE_DB){ ensureSession(); }   // crea sesión anónima (sin correo) para contar las 3 consultas/día
+  if(USE_DB){ ensureSession(); }   // crea sesión anónima (sin correo) para contar las 10 consultas/día
+  renderTurnstile();               // widget anti-bot (invisible salvo riesgo alto)
 })();
 // Garantiza una sesión: anónima si no hay ninguna; registra contacto solo si es cuenta real
 async function ensureSession(){
@@ -846,10 +898,42 @@ async function ensureSession(){
   try{
     let { data:{ session } } = await sb.auth.getSession();
     if(!session){ const r = await sb.auth.signInAnonymously(); session = r.data ? r.data.session : null; }
-    const u = session && session.user;
-    if(u && !u.is_anonymous) upsertContact(u);
     return session;
   }catch(e){ return null; }
+}
+// Huella técnica ANÓNIMA del dispositivo (FingerprintJS open-source). No identifica a la persona;
+// solo evita duplicados y frena el abuso. Se divulga en el apartado legal.
+// --- Turnstile: render del widget + verificación humana ---
+let CF_WIDGET_ID = null, CF_TOKEN = '';
+function renderTurnstile(){
+  if(!TURNSTILE_SITEKEY) return;
+  if(window.turnstile && turnstile.render){
+    try{ CF_WIDGET_ID = turnstile.render('#cfTurnstile', { sitekey:TURNSTILE_SITEKEY, appearance:'interaction-only', callback:t=>{ CF_TOKEN=t; } }); }catch(e){}
+  } else { setTimeout(renderTurnstile, 400); }
+}
+async function verifyHuman(){
+  if(!USE_DB || !TURNSTILE_SITEKEY) return true;
+  try{
+    const token = (window.turnstile && CF_WIDGET_ID!=null) ? (turnstile.getResponse(CF_WIDGET_ID)||CF_TOKEN) : CF_TOKEN;
+    if(!token) return true;                       // el widget aún no resuelve → no bloqueamos (otras capas protegen)
+    const r = await fetch('/api/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({token})});
+    try{ if(window.turnstile && CF_WIDGET_ID!=null) turnstile.reset(CF_WIDGET_ID); }catch(e){}
+    CF_TOKEN='';
+    if(!r.ok) return true;                          // fail-open si el endpoint falla
+    const d = await r.json().catch(()=>({success:true}));
+    return d.success !== false;
+  }catch(e){ return true; }
+}
+let DEVICE_FP = null;
+async function getFingerprint(){
+  if(DEVICE_FP!==null) return DEVICE_FP;
+  try{
+    const FP = await import('https://openfpcdn.io/fingerprintjs/v4');
+    const agent = await FP.load();
+    const r = await agent.get();
+    DEVICE_FP = r.visitorId || '';
+  }catch(e){ DEVICE_FP=''; }
+  return DEVICE_FP;
 }
 window.addEventListener('load',buildThread);
 let _thT; window.addEventListener('resize',()=>{clearTimeout(_thT);_thT=setTimeout(buildThread,250);});
@@ -967,8 +1051,8 @@ const INFO={
   faq:{t:'Preguntas frecuentes',h:'<div class="faq"><b>¿Es anónimo?</b>Sí. No pedimos tu nombre y solo mostramos rangos agregados.<b>¿Cuánto cuesta?</b>Gratis para siempre para las personas.<b>¿De dónde salen los datos?</b>De las respuestas de la comunidad, más fuentes públicas de referencia.<b>¿Puedo confiar en el rango?</b>Mientras más gente responde, más preciso. Siempre te mostramos el nivel de confianza.</div>'},
   goal:{t:'Nuestra misión',h:'Creemos que saber cuánto vale tu trabajo no debería ser un secreto. Nuestra meta es llevar transparencia salarial a Guatemala para que cada persona negocie con datos —no a ciegas— y para que el mercado laboral sea más justo.'},
   contact:{t:'Contáctanos',h:'¿Dudas, alianzas o prensa? Escríbenos a <a href="mailto:hola@salariojusto.com">hola@salariojusto.com</a>.'},
-  terms:{t:'Términos y condiciones',h:'Este es un prototipo con datos ficticios. Los términos definitivos se publicarán antes del lanzamiento. El uso será gratuito para las personas y los datos se tratarán de forma anónima y agregada.'},
-  privacy:{t:'Privacidad',h:'Tus respuestas son anónimas. No almacenamos datos que te identifiquen y solo publicamos rangos de 5 o más personas. Podrás borrar tu información cuando quieras.'},
+  terms:{t:'Términos y condiciones',h:'Este es un prototipo con datos ficticios; los términos definitivos se publicarán antes del lanzamiento. El uso es gratuito para las personas.<br><br><b>Uso justo y anti-abuso.</b> Para proteger la calidad e integridad de los datos, cada dispositivo tiene un límite de consultas por día. Queda prohibido el uso automatizado, la extracción masiva (scraping) o cualquier intento de reconstruir la base de datos; podemos limitar o bloquear ese uso.<br><br><b>Uso de los datos.</b> Las respuestas se tratan de forma anónima y agregada, y pueden usarse o licenciarse como estadísticas agregadas (benchmarks) a terceros —nunca datos individuales identificables. El servicio se ofrece "tal cual", sin garantía sobre la exactitud de las estimaciones; son referenciales.'},
+  privacy:{t:'Privacidad',h:'Tus respuestas son anónimas: no pedimos correo, teléfono ni cuenta, y no guardamos datos que te identifiquen. Solo mostramos rangos calculados con 5 o más respuestas —nunca salarios individuales.<br><br><b>Cómo evitamos el abuso sin pedirte datos.</b> Para no duplicar registros y frenar el spam usamos una huella técnica anónima de tu navegador (<i>device fingerprint</i>) y tu dirección IP. Son señales pseudónimas: no revelan quién eres, no se venden ni se comparten, y solo sirven para contar consultas y evitar duplicados.<br><br>Puedes pedir que borremos tu información cuando quieras escribiendo a <a href="mailto:hola@salariojusto.com">hola@salariojusto.com</a>.'},
 };
 function openInfo(k){const d=INFO[k];if(!d)return;document.getElementById('modalTitle').textContent=d.t;document.getElementById('modalBody').innerHTML=d.h;document.getElementById('modalBg').classList.add('on');}
 
@@ -985,24 +1069,22 @@ async function loadEngagement(role){
     engCache[key]=skillEng;
   }catch(e){ skillEng={}; }
 }
+const SKILLS_SHOWN = 10;   // solo mostramos las 10 más pertinentes
 async function renderSkills(role, keep){
   if(!keep) selectedSkills.clear();
   await loadEngagement(role);
   const ind = (document.getElementById('ind')||{}).value;
   const box=document.getElementById('skills'); box.innerHTML='';
   const eng = l => skillEng[l]||0;
-  const shown = skillsFor(role, ind);
-  CATEGORIES.forEach(cat=>{
-    const items = shown.filter(s=>s.cat===cat).sort((a,b)=> (eng(b.l)-eng(a.l)) || (b.p-a.p));
-    if(!items.length) return;
-    const sec=document.createElement('div'); sec.className='skillcat';
-    const h=document.createElement('h5'); h.textContent=cat; sec.appendChild(h);
-    const row=document.createElement('div'); row.className='chips';
-    items.forEach(s=>{ const c=addChip(s.l,s.p,row); if(selectedSkills.has(s.l)) c.classList.add('on'); });
-    sec.appendChild(row); box.appendChild(sec);
-  });
-  // fila para habilidades agregadas por el usuario (y para conservar las elegidas que ya no se muestran)
-  const cr=document.createElement('div'); cr.className='chips'; cr.id='customRow'; box.appendChild(cr);
+  // top 10 del puesto (+industria): manda la recurrencia; al inicio (sin datos) sale aleatorio estable
+  const top = skillsFor(role, ind)
+    .sort((a,b)=> (eng(b.l)-eng(a.l)) || (a.rnd-b.rnd))
+    .slice(0, SKILLS_SHOWN);
+  const row=document.createElement('div'); row.className='chips';
+  top.forEach(s=>{ const c=addChip(s.l,s.p,row); if(selectedSkills.has(s.l)) c.classList.add('on'); });
+  box.appendChild(row);
+  // fila para las que agregue el usuario (y para conservar las elegidas que ya no se muestran)
+  const cr=document.createElement('div'); cr.className='chips'; cr.id='customRow'; cr.style.marginTop='8px'; box.appendChild(cr);
   const present=new Set([...box.querySelectorAll('.chip')].map(c=>c.dataset.label));
   [...selectedSkills.keys()].forEach(l=>{ if(!present.has(l)){ const c=addChip(l, selectedSkills.get(l)||.04, cr); c.classList.add('on'); }});
   updateSkillHint();
@@ -1036,7 +1118,7 @@ function flashHint(){ const h=document.getElementById('skillHint'); if(!h)return
 function updateSenHint(){
   const h=document.getElementById('senHint'); if(!h) return;
   const v=(document.getElementById('sen')||{}).value;
-  h.textContent = SEN_DEF[v] ? SEN_DEF[v]+' Es tu alcance en el puesto, no tu edad ni tus años.' : '';
+  h.textContent = SEN_DEF[v] ? SEN_DEF[v]+' Cuenta por gente a cargo o por dominio técnico — es el nivel de la plaza, no tus años.' : '';
 }
 
 function fmt(gtq,cur){
@@ -1073,11 +1155,12 @@ async function compute(){
   if(!base||base<=0){ openModal("Falta tu salario base","Ingresa tu salario base mensual para calcular tu posición. (Es anónimo.)"); return; }
   const btn=document.querySelector('#formCard .cta'); if(btn){ btn.disabled=true; btn.dataset.txt=btn.innerHTML; btn.innerHTML='Calculando…'; }
   if(USE_DB) await ensureSession();
+  if(USE_DB){ const human = await verifyHuman(); if(!human){ if(btn){ btn.disabled=false; btn.innerHTML=btn.dataset.txt; } openModal('Un momento','No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo.'); return; } }
   const st = await estimate(inp);
   if(btn){ btn.disabled=false; btn.innerHTML=btn.dataset.txt; }
   if(st && st.limited){ showLimit(st); return; }   // llegó al límite diario
   LAST = { st, inp };
-  go('login');                 // primero preguntamos si quiere iniciar sesión
+  proceedToResults();          // sin correo ni login: directo al resultado
 }
 function val(id){return document.getElementById(id).value;}
 function showVar(){ document.getElementById('varToggle').style.display='none'; document.getElementById('varField').style.display=''; document.getElementById('variable').focus(); }
@@ -1106,28 +1189,13 @@ function proceedToResults(){ if(!LAST.st) return; recordSubmission(LAST.inp); re
 /* --- pantalla de límite diario alcanzado --- */
 function showLimit(st){
   const sub=document.getElementById('limitSub');
-  if(sub){
-    const lim = st.daily_limit || 3;
-    sub.textContent = st.is_anon===false
-      ? `Alcanzaste tu límite de ${lim} consultas de hoy. Vuelve mañana para seguir explorando el mercado.`
-      : `Puedes hacer ${lim} consultas gratis al día. Vuelve mañana, o crea tu cuenta para ampliar tu límite.`;
-  }
-  // si ya tiene cuenta, no tiene sentido pedirle el correo de nuevo
+  const lim = st.daily_limit || 10;
+  if(sub) sub.textContent = `Puedes hacer ${lim} consultas gratis al día. Vuelve mañana para seguir explorando el mercado — sin registrarte.`;
+  // sin cuentas: ocultamos cualquier invitación a registrarse
   const promise=document.querySelector('#limit .promise'), row=document.querySelector('#limit .emailrow');
-  const showSignup = st.is_anon!==false;
-  if(promise) promise.style.display = showSignup ? '' : 'none';
-  if(row) row.style.display = showSignup ? '' : 'none';
+  if(promise) promise.style.display='none';
+  if(row) row.style.display='none';
   go('limit');
-}
-async function limitSignup(){
-  const email=(document.getElementById('limitEmail').value||'').trim();
-  if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ openModal('Revisa tu correo','Escribe un correo válido para enviarte el enlace.'); return; }
-  if(!USE_DB){ openModal('Listo (demo)','En la versión real te enviaríamos un enlace para ampliar tu límite.'); return; }
-  try{
-    const {error}=await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
-    if(error) throw error;
-    openModal('Revisa tu correo','Te enviamos un enlace. Al entrar con tu cuenta tendrás más consultas por día.');
-  }catch(e){ openModal('Ups', (e.message||'No se pudo enviar el enlace')+'.'); }
 }
 
 /* --- registrar el envío para alimentar el modelo (dedup si hay sesión) --- */
@@ -1160,7 +1228,8 @@ async function upsertContact(user){
 }
 
 /* --- recomendaciones basadas en datos --- */
-const NEXT_EDU={hs:'tech',tech:'bach',bach:'master'};
+const NEXT_EDU={hs:'tech',tech:'bach',lic_proc:'bach',bach:'master'};
+function eduRecoTitle(edu){ return edu==='lic_proc' ? 'Termina tu licenciatura' : `Estudia ${EDU_RECO[NEXT_EDU[edu]]}`; }
 const NEXT_SEN={junior:'mid',mid:'senior',senior:'lead',lead:'manager'};
 const NEXT_EXP={'0-2':'3-5','3-5':'6-10','6-10':'10+'};
 const EDU_RECO={tech:'una carrera técnica',bach:'una licenciatura',master:'una maestría o posgrado'};
@@ -1174,13 +1243,13 @@ function recommendations(inp){
   const baseMed=personalMedian(base);
   const recs=[];
   if(NEXT_EDU[inp.edu]){ const up=personalMedian({...base,edu:NEXT_EDU[inp.edu]})-baseMed;
-    recs.push({ic:'🎓',title:`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`,detail:`Subir tu nivel educativo eleva el rango de tu perfil.`,up}); }
+    recs.push({ic:'🎓',title:eduRecoTitle(inp.edu),detail:`Subir tu nivel educativo eleva el rango de tu perfil.`,up}); }
   if(NEXT_SEN[inp.sen]){ const up=personalMedian({...base,sen:NEXT_SEN[inp.sen]})-baseMed;
     recs.push({ic:'↗',title:`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`,detail:`El salto de nivel es el mayor impulsor del salario.`,up}); }
   if(NEXT_EXP[inp.exp]){ const up=personalMedian({...base,exp:NEXT_EXP[inp.exp]})-baseMed;
     recs.push({ic:'⏳',title:`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`,detail:`Cada tramo de experiencia mueve el rango hacia arriba.`,up}); }
   if(inp.size!=='multi'){ const up=personalMedian({...base,size:'multi'})-baseMed;
-    recs.push({ic:'🏢',title:`Apunta a empresas grandes o multinacionales`,detail:`Suelen pagar por encima del promedio para tu perfil.`,up}); }
+    recs.push({ic:'🏢',title:`Apunta a empresas más grandes (1,000+ empleados)`,detail:`Suelen pagar por encima del promedio para tu perfil.`,up}); }
   const chosen=new Set([...selectedSkills.keys()].map(s=>s.toLowerCase()));
   skillsFor(inp.role, inp.ind).filter(s=>!chosen.has(s.l.toLowerCase())).sort((a,b)=>b.p-a.p).slice(0,2).forEach(s=>{
     const up=baseMed*(s.p/skillPrem);
@@ -1189,6 +1258,27 @@ function recommendations(inp){
   });
   recs.sort((a,b)=>b.up-a.up);
   return { recs:recs.filter(r=>r.up>50).slice(0,4), targetP90:personalMedian({...base,sen:NEXT_SEN[inp.sen]||inp.sen}) };
+}
+/* --- Espacio patrocinado (nativo). SPONSORS: aquí entran los anuncios reales de reclutadores.
+   Cada uno: {title, detail, cta, url, logo, roles:[...opcional]}. Vacío => anuncio de casa. --- */
+const SPONSORS = [];
+function renderAds(inp){
+  const slot=document.getElementById('adSlot'); if(!slot) return;
+  slot.innerHTML='';
+  const roleLabel = roleMeta(inp).label;
+  const ads = SPONSORS.filter(a=>!a.roles || a.roles.includes(inp.role)).slice(0,2);
+  if(ads.length){
+    ads.forEach(a=>{
+      const el=document.createElement('a'); el.className='ad-item'; el.href=a.url||'#'; el.target='_blank'; el.rel='noopener sponsored nofollow';
+      el.innerHTML=`<span class="ad-logo">${a.logo||'★'}</span><div class="ad-body"><b>${a.title}</b><span>${a.detail}</span></div><span class="ad-cta">${a.cta||'Ver →'}</span>`;
+      slot.appendChild(el);
+    });
+  } else {
+    const el=document.createElement('a'); el.className='ad-item ad-house';
+    el.href='mailto:hola@salariojusto.com?subject=Quiero%20anunciarme%20en%20SalarioJusto';
+    el.innerHTML=`<span class="ad-logo">＋</span><div class="ad-body"><b>¿Reclutas ${roleLabel.toLowerCase()}?</b><span>Llega a personas que justo están evaluando su salario. Tu empresa aquí.</span></div><span class="ad-cta">Anúnciate →</span>`;
+    slot.appendChild(el);
+  }
 }
 function renderRecos(inp, st){
   const box=document.getElementById('recos'), foot=document.getElementById('recoFoot');
@@ -1208,10 +1298,10 @@ function recommendationsDB(inp, baseMedian){
   const base = baseMedian || 0;
   const out = [];
   const add=(ic,title,detail,ratio)=>{ const up = base*(ratio-1); if(up>50) out.push({ic,title,detail,up}); };
-  if(NEXT_EDU[inp.edu]) add('🎓',`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`,'Subir tu nivel educativo eleva el rango del mercado.', EDU.mult[NEXT_EDU[inp.edu]]/EDU.mult[inp.edu]);
+  if(NEXT_EDU[inp.edu]) add('🎓',eduRecoTitle(inp.edu),'Subir tu nivel educativo eleva el rango del mercado.', EDU.mult[NEXT_EDU[inp.edu]]/EDU.mult[inp.edu]);
   if(NEXT_SEN[inp.sen]) add('↗',`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`,'El salto de nivel es el mayor impulsor del salario.', SEN.mult[NEXT_SEN[inp.sen]]/SEN.mult[inp.sen]);
   if(NEXT_EXP[inp.exp]) add('⏳',`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`,'Cada tramo de experiencia mueve el rango hacia arriba.', EXP.mult[NEXT_EXP[inp.exp]]/EXP.mult[inp.exp]);
-  if(inp.size!=='multi') add('🏢','Apunta a empresas grandes o multinacionales','Suelen pagar por encima del promedio para tu perfil.', SIZE.mult['multi']/SIZE.mult[inp.size]);
+  if(inp.size!=='multi') add('🏢','Apunta a empresas más grandes (1,000+ empleados)','Suelen pagar por encima del promedio para tu perfil.', SIZE.mult['multi']/SIZE.mult[inp.size]);
   return out.sort((a,b)=>b.up-a.up).slice(0,4);
 }
 
@@ -1261,6 +1351,7 @@ function render(st,inp){
     : `Basado en ~${nShow} perfiles similares.`;
 
   renderRecos(inp, st);
+  renderAds(inp);
   drawCurve(st,inp);
 }
 

@@ -109,6 +109,9 @@
   .varremove{float:right;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;font-weight:600}
   .varremove:hover{color:var(--ink)}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+  .skillbox{margin-top:2px}
+  .skillcat{margin-bottom:12px}
+  .skillcat h5{margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.8}
   .chip{border:1px solid var(--line);background:#fbfcfc;padding:8px 13px;border-radius:999px;font-size:13.5px;cursor:pointer;user-select:none;font-weight:600;color:var(--muted);transition:all .12s}
   .chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
   .full{grid-column:1/-1}
@@ -344,6 +347,7 @@
             <option value="lead">Líder / Jefe</option>
             <option value="manager">Gerente</option>
           </select>
+          <div class="hint" id="senHint"></div>
         </div>
         <div class="field">
           <label class="lbl">Años de experiencia</label>
@@ -378,20 +382,27 @@
           <select id="ind">
             <option value="tech">Tecnología / software</option>
             <option value="fin">Banca / finanzas</option>
+            <option value="seguros">Seguros</option>
             <option value="manu">Manufactura</option>
+            <option value="alim">Alimentos y bebidas</option>
+            <option value="farma">Farmacéutica / química</option>
             <option value="com">Comercio / retail</option>
             <option value="salud">Salud</option>
             <option value="edu">Educación</option>
             <option value="tel">Telecomunicaciones</option>
             <option value="serv" selected>Servicios</option>
+            <option value="legal">Legal / jurídico</option>
+            <option value="medios">Medios / publicidad</option>
             <option value="agro">Agroindustria / agropecuario</option>
             <option value="constr">Construcción / inmobiliaria</option>
             <option value="turismo">Turismo / hotelería / restaurantes</option>
+            <option value="energia">Energía / minería</option>
             <option value="bpo">Call center / BPO</option>
             <option value="transp">Transporte / logística</option>
             <option value="gob">Gobierno / ONG</option>
-            <option value="otro">Otra</option>
+            <option value="__other__">➕ Mi industria no está en la lista</option>
           </select>
+          <input id="indOther" type="text" placeholder="Escribe tu industria" maxlength="40" style="display:none;margin-top:8px">
         </div>
         <div class="field">
           <label class="lbl">Tamaño de la empresa</label>
@@ -422,8 +433,8 @@
           <div class="hint">Para trabajos con base baja y comisión alta. Usa un promedio mensual.</div>
         </div>
         <div class="field full">
-          <label class="lbl">Habilidades <span class="opt">(elige hasta 5) · <span id="skillHint">0/5</span></span></label>
-          <div class="chips" id="skills"></div>
+          <label class="lbl">Habilidades <span class="opt">(elige hasta 5, las más elegidas primero) · <span id="skillHint">0/5</span></span></label>
+          <div id="skills" class="skillbox"></div>
           <div class="addskill">
             <input id="customSkill" type="text" placeholder="Agregar otra…" maxlength="26"
                    onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSkill();}">
@@ -597,23 +608,119 @@ const EXP  = {mult:{"0-2":.9,"3-5":1,"6-10":1.15,"10+":1.28}, share:{"0-2":.30,"
 const EDU  = {mult:{hs:.85,tech:.95,bach:1,master:1.2}, share:{hs:.15,tech:.25,bach:.45,master:.15}, label:{hs:"Bachillerato",tech:"Técnico",bach:"Licenciatura",master:"Maestría+"}};
 const LOC  = {mult:{gt:1,sac:.95,xela:.8,esc:.88,otro:.75}, share:{gt:.55,sac:.08,xela:.12,esc:.05,otro:.20}, label:{gt:"Guatemala",sac:"Sacatepéquez",xela:"Quetzaltenango",esc:"Escuintla",otro:"Interior"}};
 const SIZE = {mult:{micro:.8,peq:.9,med:1,grande:1.2,multi:1.45}, share:{micro:.2,peq:.3,med:.3,grande:.15,multi:.05}, label:{micro:"Micro",peq:"Pequeña",med:"Mediana",grande:"Grande",multi:"Multinacional"}};
-const IND  = {mult:{tech:1.15,fin:1.2,manu:1,com:.9,salud:1.05,edu:.85,tel:1.1,serv:.95,gob:.92,agro:.9,constr:1.0,turismo:.85,bpo:.95,transp:.95,otro:1}, share:0.11, label:{tech:"Tecnología",fin:"Finanzas",manu:"Manufactura",com:"Comercio",salud:"Salud",edu:"Educación",tel:"Telecom",serv:"Servicios",gob:"Gobierno/ONG",agro:"Agroindustria",constr:"Construcción",turismo:"Turismo",bpo:"Call center/BPO",transp:"Transporte/logística",otro:"Otra"}};
-
-// Habilidades sugeridas por rol (las más pertinentes primero)
-const SKILLS_BY_ROLE = {
-  dev:      [{l:"Inglés avanzado",p:.10},{l:"Cloud / AWS",p:.08},{l:"React",p:.05},{l:"Python",p:.05},{l:"Node.js",p:.04},{l:"SQL",p:.03},{l:"Docker / DevOps",p:.05}],
-  data:     [{l:"Python",p:.06},{l:"SQL",p:.05},{l:"Machine Learning / IA",p:.09},{l:"Power BI / Tableau",p:.05},{l:"Inglés avanzado",p:.08},{l:"Estadística",p:.04}],
-  pm:       [{l:"Certificación PMP",p:.08},{l:"Scrum / Agile",p:.06},{l:"Liderazgo de equipo",p:.05},{l:"Inglés avanzado",p:.08},{l:"Jira",p:.03},{l:"Presupuestos",p:.04}],
-  design:   [{l:"Figma",p:.06},{l:"UX Research",p:.06},{l:"Adobe Illustrator",p:.04},{l:"Prototipado",p:.04},{l:"Portafolio sólido",p:.05},{l:"Inglés avanzado",p:.06}],
-  mkt:      [{l:"Google / Meta Ads",p:.06},{l:"SEO / SEM",p:.05},{l:"Analítica web",p:.05},{l:"Inglés avanzado",p:.07},{l:"Manejo de CRM",p:.04},{l:"Contenido / Copy",p:.03}],
-  contador: [{l:"NIIF",p:.06},{l:"SAT / impuestos",p:.05},{l:"ERP (SAP)",p:.06},{l:"Excel avanzado",p:.03},{l:"Auditoría",p:.05},{l:"Inglés",p:.06}],
-  ventas:   [{l:"Cierre de ventas",p:.06},{l:"Manejo de CRM",p:.04},{l:"Prospección",p:.04},{l:"Negociación",p:.05},{l:"Inglés avanzado",p:.08}],
-  rrhh:     [{l:"Reclutamiento",p:.05},{l:"Nómina",p:.04},{l:"Legislación laboral",p:.05},{l:"Clima organizacional",p:.04},{l:"HRIS",p:.05},{l:"Inglés",p:.06}],
-  medico:   [{l:"Especialidad",p:.10},{l:"Colegiado activo",p:.04},{l:"Emergencias",p:.06},{l:"Cirugía",p:.09},{l:"Inglés",p:.05}],
-  civil:    [{l:"AutoCAD",p:.05},{l:"Gestión de obra",p:.06},{l:"Revit / BIM",p:.06},{l:"Presupuestos",p:.05},{l:"Supervisión",p:.04},{l:"Inglés",p:.05}],
-  admin:    [{l:"Excel avanzado",p:.05},{l:"Inglés",p:.07},{l:"Gestión documental",p:.03},{l:"ERP",p:.05},{l:"Atención al cliente",p:.03}],
-  cc:       [{l:"Inglés bilingüe",p:.12},{l:"Ventas telefónicas",p:.05},{l:"Manejo de CRM",p:.04},{l:"Soporte técnico",p:.05}],
+const IND  = {mult:{tech:1.15,fin:1.2,manu:1,com:.9,salud:1.05,edu:.85,tel:1.1,serv:.95,gob:.92,agro:.9,constr:1.0,turismo:.85,bpo:.95,transp:.95,legal:1.1,seguros:1.05,farma:1.1,alim:.95,energia:1.15,medios:.95,otro:1,__other__:1}, share:0.11, label:{tech:"Tecnología",fin:"Finanzas",manu:"Manufactura",com:"Comercio",salud:"Salud",edu:"Educación",tel:"Telecom",serv:"Servicios",gob:"Gobierno/ONG",agro:"Agroindustria",constr:"Construcción",turismo:"Turismo",bpo:"Call center/BPO",transp:"Transporte/logística",legal:"Legal",seguros:"Seguros",farma:"Farmacéutica",alim:"Alimentos y bebidas",energia:"Energía / minería",medios:"Medios / publicidad",otro:"Otra"}};
+// Definiciones de nivel (por alcance/responsabilidad, NO por edad ni años — eso se pregunta aparte)
+const SEN_DEF = {
+  junior:"Ejecutas tareas con supervisión. Estás aprendiendo el puesto.",
+  mid:"Trabajas de forma autónoma en lo tuyo; ya no necesitas guía constante.",
+  senior:"Dominas tu área y resuelves problemas complejos. Otros te consultan.",
+  lead:"Coordinas o guías a un equipo, aunque no seas el jefe formal.",
+  manager:"Diriges un área o equipo y respondes por sus resultados."
 };
+
+// ---- Catálogo de habilidades (largo, por categoría, relevante a puesto + industria) ----
+// roles: en qué puestos aplica ('*' = todos). inds: industrias donde también aplica.
+// p: premio estimado sobre la mediana (solo modelo local). El orden real lo define el
+// engagement: cuanto más se elige una habilidad (globalmente), más arriba aparece.
+const CATEGORIES = ["Idiomas","Habilidades del puesto","Herramientas y software","Certificaciones","Liderazgo y gestión"];
+const SKILL_CATALOG = [
+  // --- Idiomas ---
+  {l:"Inglés avanzado",p:.09,cat:"Idiomas",roles:["*"]},
+  {l:"Inglés bilingüe / nativo",p:.12,cat:"Idiomas",roles:["*"]},
+  {l:"Otro idioma (portugués, alemán…)",p:.05,cat:"Idiomas",roles:["*"]},
+  // --- Habilidades del puesto ---
+  {l:"Programación backend",p:.05,cat:"Habilidades del puesto",roles:["dev"]},
+  {l:"Programación frontend",p:.05,cat:"Habilidades del puesto",roles:["dev"]},
+  {l:"Arquitectura de software",p:.07,cat:"Habilidades del puesto",roles:["dev"]},
+  {l:"Ciberseguridad",p:.07,cat:"Habilidades del puesto",roles:["dev"],inds:["fin","tech","seguros"]},
+  {l:"Machine Learning / IA",p:.09,cat:"Habilidades del puesto",roles:["data","dev"]},
+  {l:"Estadística",p:.04,cat:"Habilidades del puesto",roles:["data"]},
+  {l:"Modelado de datos",p:.05,cat:"Habilidades del puesto",roles:["data","dev"]},
+  {l:"Ingeniería de datos",p:.06,cat:"Habilidades del puesto",roles:["data","dev"]},
+  {l:"Gestión de proyectos",p:.05,cat:"Habilidades del puesto",roles:["pm","civil"]},
+  {l:"Metodologías ágiles (Scrum)",p:.05,cat:"Habilidades del puesto",roles:["pm","dev","design"]},
+  {l:"Gestión de riesgos",p:.04,cat:"Habilidades del puesto",roles:["pm","contador"],inds:["fin","seguros","constr"]},
+  {l:"UX Research",p:.06,cat:"Habilidades del puesto",roles:["design"]},
+  {l:"Diseño de producto",p:.05,cat:"Habilidades del puesto",roles:["design"]},
+  {l:"Prototipado",p:.04,cat:"Habilidades del puesto",roles:["design"]},
+  {l:"Branding / identidad",p:.04,cat:"Habilidades del puesto",roles:["design","mkt"]},
+  {l:"Publicidad digital (Google / Meta Ads)",p:.06,cat:"Habilidades del puesto",roles:["mkt"]},
+  {l:"SEO / SEM",p:.05,cat:"Habilidades del puesto",roles:["mkt"]},
+  {l:"Analítica web",p:.05,cat:"Habilidades del puesto",roles:["mkt","data"]},
+  {l:"Estrategia de contenido",p:.03,cat:"Habilidades del puesto",roles:["mkt"]},
+  {l:"NIIF",p:.06,cat:"Habilidades del puesto",roles:["contador"]},
+  {l:"Impuestos / SAT",p:.05,cat:"Habilidades del puesto",roles:["contador"]},
+  {l:"Auditoría",p:.05,cat:"Habilidades del puesto",roles:["contador"]},
+  {l:"Costos",p:.04,cat:"Habilidades del puesto",roles:["contador"],inds:["manu","constr"]},
+  {l:"Cierre de ventas",p:.06,cat:"Habilidades del puesto",roles:["ventas"]},
+  {l:"Prospección",p:.04,cat:"Habilidades del puesto",roles:["ventas"]},
+  {l:"Negociación",p:.05,cat:"Habilidades del puesto",roles:["ventas","pm","rrhh"]},
+  {l:"Ventas B2B",p:.05,cat:"Habilidades del puesto",roles:["ventas"]},
+  {l:"Reclutamiento y selección",p:.05,cat:"Habilidades del puesto",roles:["rrhh"]},
+  {l:"Nómina",p:.04,cat:"Habilidades del puesto",roles:["rrhh","contador"]},
+  {l:"Legislación laboral",p:.05,cat:"Habilidades del puesto",roles:["rrhh","admin"]},
+  {l:"Compensaciones y beneficios",p:.05,cat:"Habilidades del puesto",roles:["rrhh"]},
+  {l:"Especialidad médica",p:.10,cat:"Habilidades del puesto",roles:["medico"]},
+  {l:"Cirugía",p:.09,cat:"Habilidades del puesto",roles:["medico"]},
+  {l:"Medicina de emergencias",p:.06,cat:"Habilidades del puesto",roles:["medico"]},
+  {l:"Cuidados intensivos",p:.07,cat:"Habilidades del puesto",roles:["medico"]},
+  {l:"Gestión de obra",p:.06,cat:"Habilidades del puesto",roles:["civil"]},
+  {l:"Diseño estructural",p:.06,cat:"Habilidades del puesto",roles:["civil"]},
+  {l:"Presupuestos de obra",p:.05,cat:"Habilidades del puesto",roles:["civil"]},
+  {l:"Supervisión de proyectos",p:.04,cat:"Habilidades del puesto",roles:["civil","pm"]},
+  {l:"Gestión documental",p:.03,cat:"Habilidades del puesto",roles:["admin"]},
+  {l:"Compras / proveedores",p:.04,cat:"Habilidades del puesto",roles:["admin","contador"]},
+  {l:"Soporte técnico",p:.05,cat:"Habilidades del puesto",roles:["cc","dev"]},
+  {l:"Retención de clientes",p:.05,cat:"Habilidades del puesto",roles:["cc","ventas"]},
+  // industria
+  {l:"Atención al paciente",p:.04,cat:"Habilidades del puesto",inds:["salud"]},
+  {l:"Buenas prácticas de manufactura (BPM)",p:.05,cat:"Habilidades del puesto",inds:["manu","farma","alim"]},
+  {l:"Control de calidad",p:.04,cat:"Habilidades del puesto",inds:["manu","farma","alim","constr"]},
+  {l:"Manejo de inventarios",p:.03,cat:"Habilidades del puesto",inds:["com","transp","manu"]},
+  {l:"Normas de higiene y seguridad",p:.03,cat:"Habilidades del puesto",inds:["turismo","alim","salud","manu"]},
+  {l:"Atención al huésped",p:.04,cat:"Habilidades del puesto",inds:["turismo"]},
+  {l:"Análisis de crédito / riesgo",p:.06,cat:"Habilidades del puesto",roles:["contador","data"],inds:["fin","seguros"]},
+  // --- Herramientas y software ---
+  {l:"Excel avanzado",p:.04,cat:"Herramientas y software",roles:["*"]},
+  {l:"Google Workspace / Office",p:.02,cat:"Herramientas y software",roles:["*"]},
+  {l:"Power BI / Tableau",p:.05,cat:"Herramientas y software",roles:["data","contador","mkt","pm","admin"]},
+  {l:"Python",p:.05,cat:"Herramientas y software",roles:["dev","data"]},
+  {l:"SQL",p:.03,cat:"Herramientas y software",roles:["dev","data","pm"]},
+  {l:"Cloud (AWS / Azure / GCP)",p:.08,cat:"Herramientas y software",roles:["dev","data"]},
+  {l:"Docker / DevOps",p:.05,cat:"Herramientas y software",roles:["dev"]},
+  {l:"React / JavaScript",p:.05,cat:"Herramientas y software",roles:["dev"]},
+  {l:"Figma",p:.06,cat:"Herramientas y software",roles:["design","pm","mkt"]},
+  {l:"Adobe (Illustrator / Photoshop)",p:.04,cat:"Herramientas y software",roles:["design","mkt"]},
+  {l:"AutoCAD",p:.05,cat:"Herramientas y software",roles:["civil","design"]},
+  {l:"Revit / BIM",p:.06,cat:"Herramientas y software",roles:["civil"]},
+  {l:"SAP / ERP",p:.06,cat:"Herramientas y software",roles:["contador","admin","pm","rrhh","ventas"]},
+  {l:"CRM (Salesforce / HubSpot)",p:.04,cat:"Herramientas y software",roles:["ventas","mkt","cc","rrhh"]},
+  {l:"Jira",p:.03,cat:"Herramientas y software",roles:["pm","dev","design"]},
+  // --- Certificaciones ---
+  {l:"Certificación PMP",p:.08,cat:"Certificaciones",roles:["pm","civil"]},
+  {l:"Scrum Master (CSM)",p:.06,cat:"Certificaciones",roles:["pm","dev","design"]},
+  {l:"Certificación cloud (AWS / Azure)",p:.07,cat:"Certificaciones",roles:["dev","data"]},
+  {l:"Colegiado activo",p:.04,cat:"Certificaciones",roles:["medico","civil","contador"]},
+  {l:"CPA / contador certificado",p:.06,cat:"Certificaciones",roles:["contador"]},
+  {l:"Six Sigma / ISO calidad",p:.05,cat:"Certificaciones",roles:["pm","contador"],inds:["manu","farma"]},
+  // --- Liderazgo y gestión ---
+  {l:"Liderazgo de equipo",p:.05,cat:"Liderazgo y gestión",roles:["*"]},
+  {l:"Comunicación efectiva",p:.02,cat:"Liderazgo y gestión",roles:["*"]},
+  {l:"Toma de decisiones",p:.03,cat:"Liderazgo y gestión",roles:["*"]},
+  {l:"Gestión de presupuesto",p:.04,cat:"Liderazgo y gestión",roles:["pm","contador","ventas","rrhh"]},
+  {l:"Manejo de clientes clave",p:.04,cat:"Liderazgo y gestión",roles:["ventas","mkt","cc"]},
+];
+// ¿mostrar esta habilidad para el rol e industria elegidos?
+function skillShown(s, role, ind){
+  const hasR = !!(s.roles && s.roles.length), hasI = !!(s.inds && s.inds.length);
+  if(!hasR && !hasI) return true;
+  const rOk = hasR && (s.roles.includes('*') || s.roles.includes(role));
+  const iOk = hasI && s.inds.includes(ind);
+  return rOk || iOk;
+}
+function skillsFor(role, ind){ return SKILL_CATALOG.filter(s=>skillShown(s,role,ind)); }
+let skillEng = {};            // {label: veces elegida} — engagement global
+const engCache = {};          // cache por rol
 const MAX_SKILLS = 5;
 const USD_RATE = 7.8;
 let selectedSkills = new Map(); // label -> prem
@@ -714,6 +821,19 @@ function go(id){
     renderSkills(roleSel.value);
   });
   renderSkills(roleSel.value);
+  // Industria: "+ agregar" propia + re-render de habilidades relevantes (conservando lo elegido)
+  const indSel=document.getElementById('ind');
+  indSel.addEventListener('change',()=>{
+    const other = indSel.value==='__other__';
+    const io=document.getElementById('indOther');
+    io.style.display = other ? '' : 'none';
+    if(other) io.focus();
+    renderSkills(document.getElementById('role').value, true);   // keep=true: no borres lo elegido
+  });
+  // Nivel / seniority: explica qué significa el nivel elegido
+  const senSel=document.getElementById('sen');
+  senSel.addEventListener('change',updateSenHint);
+  updateSenHint();
   const curSel=document.getElementById('cur');
   curSel.addEventListener('change',e=>{ document.getElementById('varCur').textContent = e.target.value==='USD'?'$ USD':'Q GTQ'; });
   buildAvatars();
@@ -852,10 +972,39 @@ const INFO={
 };
 function openInfo(k){const d=INFO[k];if(!d)return;document.getElementById('modalTitle').textContent=d.t;document.getElementById('modalBody').innerHTML=d.h;document.getElementById('modalBg').classList.add('on');}
 
-function renderSkills(role){
-  selectedSkills.clear();
+// engagement: cuántas veces se ha elegido cada habilidad (global, del servidor).
+// Cuanto mayor, más arriba aparece dentro de su categoría. Se acumula solo con
+// cada envío real; mientras no hay datos, ordena por el premio curado.
+async function loadEngagement(role){
+  if(!USE_DB){ skillEng={}; return; }
+  const key = (role==='__other__') ? '_all' : role;
+  if(engCache[key]!==undefined){ skillEng=engCache[key]; return; }
+  try{
+    const {data,error}=await sb.rpc('skill_counts',{p_role:(role==='__other__'?null:role)});
+    skillEng = (!error && data) ? data : {};
+    engCache[key]=skillEng;
+  }catch(e){ skillEng={}; }
+}
+async function renderSkills(role, keep){
+  if(!keep) selectedSkills.clear();
+  await loadEngagement(role);
+  const ind = (document.getElementById('ind')||{}).value;
   const box=document.getElementById('skills'); box.innerHTML='';
-  (SKILLS_BY_ROLE[role]||GENERIC_SKILLS).forEach(s=>addChip(s.l,s.p,box));
+  const eng = l => skillEng[l]||0;
+  const shown = skillsFor(role, ind);
+  CATEGORIES.forEach(cat=>{
+    const items = shown.filter(s=>s.cat===cat).sort((a,b)=> (eng(b.l)-eng(a.l)) || (b.p-a.p));
+    if(!items.length) return;
+    const sec=document.createElement('div'); sec.className='skillcat';
+    const h=document.createElement('h5'); h.textContent=cat; sec.appendChild(h);
+    const row=document.createElement('div'); row.className='chips';
+    items.forEach(s=>{ const c=addChip(s.l,s.p,row); if(selectedSkills.has(s.l)) c.classList.add('on'); });
+    sec.appendChild(row); box.appendChild(sec);
+  });
+  // fila para habilidades agregadas por el usuario (y para conservar las elegidas que ya no se muestran)
+  const cr=document.createElement('div'); cr.className='chips'; cr.id='customRow'; box.appendChild(cr);
+  const present=new Set([...box.querySelectorAll('.chip')].map(c=>c.dataset.label));
+  [...selectedSkills.keys()].forEach(l=>{ if(!present.has(l)){ const c=addChip(l, selectedSkills.get(l)||.04, cr); c.classList.add('on'); }});
   updateSkillHint();
 }
 function addChip(label,prem,box){
@@ -875,7 +1024,7 @@ function addCustomSkill(){
   if(selectedSkills.size>=MAX_SKILLS){ flashHint(); return; }
   // evita duplicados
   const exists=[...document.querySelectorAll('#skills .chip')].find(c=>c.dataset.label.toLowerCase()===v.toLowerCase());
-  const chip = exists || addChip(v, .04);
+  const chip = exists || addChip(v, .04, document.getElementById('customRow'));
   if(!selectedSkills.has(chip.dataset.label)) toggleSkill(chip.dataset.label,.04,chip);
   inp.value='';
 }
@@ -884,6 +1033,11 @@ function updateSkillHint(){
   if(h) h.textContent=`${selectedSkills.size}/${MAX_SKILLS}`;
 }
 function flashHint(){ const h=document.getElementById('skillHint'); if(!h)return; h.style.color='#c0392b'; setTimeout(()=>h.style.color='',700); }
+function updateSenHint(){
+  const h=document.getElementById('senHint'); if(!h) return;
+  const v=(document.getElementById('sen')||{}).value;
+  h.textContent = SEN_DEF[v] ? SEN_DEF[v]+' Es tu alcance en el puesto, no tu edad ni tus años.' : '';
+}
 
 function fmt(gtq,cur){
   const v = cur==="USD"? gtq/USD_RATE : gtq;
@@ -905,11 +1059,14 @@ async function compute(){
   const roleVal=val('role');
   const roleCustom = roleVal==='__other__' ? (document.getElementById('roleOther').value||'').trim() : '';
   if(roleVal==='__other__' && !roleCustom){ openModal("Falta tu profesión","Escribe tu profesión para continuar. (Es anónimo.)"); return; }
+  const indVal=val('ind');
+  const indCustom = indVal==='__other__' ? (document.getElementById('indOther').value||'').trim() : '';
+  if(indVal==='__other__' && !indCustom){ openModal("Falta tu industria","Escribe tu industria para continuar. (Es anónimo.)"); return; }
   const base=parseFloat(document.getElementById('salary').value);
   const variable=parseFloat(document.getElementById('variable').value)||0;
   const inp={
     role:roleVal, roleCustom, sen:val('sen'),exp:val('exp'),edu:val('edu'),
-    loc:val('loc'),ind:val('ind'),size:val('size'),cur:val('cur'),
+    loc:val('loc'),ind:indVal, indCustom, size:val('size'),cur:val('cur'),
     prest:document.getElementById('prest').checked,
     base, variable, salary:(base||0)+variable
   };
@@ -1025,7 +1182,7 @@ function recommendations(inp){
   if(inp.size!=='multi'){ const up=personalMedian({...base,size:'multi'})-baseMed;
     recs.push({ic:'🏢',title:`Apunta a empresas grandes o multinacionales`,detail:`Suelen pagar por encima del promedio para tu perfil.`,up}); }
   const chosen=new Set([...selectedSkills.keys()].map(s=>s.toLowerCase()));
-  (SKILLS_BY_ROLE[inp.role]||GENERIC_SKILLS).filter(s=>!chosen.has(s.l.toLowerCase())).sort((a,b)=>b.p-a.p).slice(0,2).forEach(s=>{
+  skillsFor(inp.role, inp.ind).filter(s=>!chosen.has(s.l.toLowerCase())).sort((a,b)=>b.p-a.p).slice(0,2).forEach(s=>{
     const up=baseMed*(s.p/skillPrem);
     const cert=/certif|pmp|niif|cloud|aws|colegiad|especialidad|revit|bim|sap|scrum/i.test(s.l);
     recs.push({ic:cert?'📜':'✳',title:`${cert?'Certifícate en':'Domina'} ${s.l}`,detail:`Habilidad muy valorada para ${roleMeta(inp).label.toLowerCase()}.`,up});
@@ -1109,7 +1266,8 @@ function render(st,inp){
 
 /* ---- resumen del perfil como chips ---- */
 function profileChips(inp){
-  const parts=[roleMeta(inp).label, SEN.label[inp.sen], EXP.label[inp.exp], EDU.label[inp.edu], LOC.label[inp.loc], IND.label[inp.ind], SIZE.label[inp.size]];
+  const indLabel = inp.ind==='__other__' ? (inp.indCustom||'Otra industria') : IND.label[inp.ind];
+  const parts=[roleMeta(inp).label, SEN.label[inp.sen], EXP.label[inp.exp], EDU.label[inp.edu], LOC.label[inp.loc], indLabel, SIZE.label[inp.size]];
   [...selectedSkills.keys()].forEach(s=>parts.push(s));
   parts.push(inp.prest?'✓ Prestaciones de ley':'✕ Sin prestaciones de ley');
   return parts.map(p=>`<span class="psum-chip">${p}</span>`).join('');

@@ -467,6 +467,23 @@
   </div>
 </section>
 
+<!-- ============ LÍMITE DIARIO ============ -->
+<section id="limit" class="panel">
+  <div class="wrap narrow">
+    <div class="card login-card">
+      <div class="check" style="background:#d97706">⏳</div>
+      <h2>Llegaste a tu límite de hoy</h2>
+      <p class="sub" id="limitSub">Puedes hacer 3 consultas gratis al día. Vuelve mañana para seguir explorando el mercado.</p>
+      <p class="promise">✨ <b>¿Quieres más consultas?</b> Crea tu cuenta con solo tu correo y amplía tu límite diario. Sin contraseñas: te enviamos un enlace para entrar.</p>
+      <div class="emailrow">
+        <input id="limitEmail" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+        <button class="cta" onclick="limitSignup()">Ampliar mi límite &nbsp;→</button>
+      </div>
+      <button class="skip" onclick="go('landing')">← Volver al inicio</button>
+    </div>
+  </div>
+</section>
+
 <!-- ============ RESULT ============ -->
 <section id="result" class="panel">
   <div class="wrap">
@@ -637,6 +654,7 @@ async function estimate(inp){
       p_location:inp.loc, p_industry:inp.ind, p_size:inp.size, p_total:gtq
     });
     if(error) throw error;
+    if(data && data.limited) return { limited:true, used:data.used, daily_limit:data.daily_limit, is_anon:data.is_anon };
     if(!data || data.median==null) return {...estimateLocal(inp), _lowdata:true};
     const d=data, median=Number(d.median);
     const sigma = (d.p84 && d.p16 && d.p16>0) ? Math.max(0.06, Math.log(d.p84/d.p16)/2) : 0.26;
@@ -644,7 +662,7 @@ async function estimate(inp){
       median, mu:Math.log(median), sigma,
       p10:+d.p10, p25:+d.p25, p50:median, p75:+d.p75, p90:+d.p90, p16:+d.p16, p84:+d.p84,
       userGTQ:gtq, userPct:+d.user_pct, n:Math.round(+d.n_effective), nRaw:+d.n_raw,
-      confidence:d.confidence, level:+d.level, dimsDropped:d.dims_dropped||[]
+      confidence:d.confidence, level:+d.level, dimsDropped:d.dims_dropped||[], usage:d.usage
     };
   }catch(e){ console.warn('salary_insight falló, uso modelo local:', e.message||e); return estimateLocal(inp); }
 }
@@ -700,9 +718,19 @@ function go(id){
   curSel.addEventListener('change',e=>{ document.getElementById('varCur').textContent = e.target.value==='USD'?'$ USD':'Q GTQ'; });
   buildAvatars();
   buildThread();
-  // Si regresa con sesión (enlace mágico / Google), registra su contacto (repositorio de correos)
-  if(USE_DB){ sb.auth.getSession().then(({data})=>{ const u=data&&data.session&&data.session.user; if(u) upsertContact(u); }).catch(()=>{}); }
+  if(USE_DB){ ensureSession(); }   // crea sesión anónima (sin correo) para contar las 3 consultas/día
 })();
+// Garantiza una sesión: anónima si no hay ninguna; registra contacto solo si es cuenta real
+async function ensureSession(){
+  if(!USE_DB) return null;
+  try{
+    let { data:{ session } } = await sb.auth.getSession();
+    if(!session){ const r = await sb.auth.signInAnonymously(); session = r.data ? r.data.session : null; }
+    const u = session && session.user;
+    if(u && !u.is_anonymous) upsertContact(u);
+    return session;
+  }catch(e){ return null; }
+}
 window.addEventListener('load',buildThread);
 let _thT; window.addEventListener('resize',()=>{clearTimeout(_thT);_thT=setTimeout(buildThread,250);});
 
@@ -887,8 +915,10 @@ async function compute(){
   };
   if(!base||base<=0){ openModal("Falta tu salario base","Ingresa tu salario base mensual para calcular tu posición. (Es anónimo.)"); return; }
   const btn=document.querySelector('#formCard .cta'); if(btn){ btn.disabled=true; btn.dataset.txt=btn.innerHTML; btn.innerHTML='Calculando…'; }
+  if(USE_DB) await ensureSession();
   const st = await estimate(inp);
   if(btn){ btn.disabled=false; btn.innerHTML=btn.dataset.txt; }
+  if(st && st.limited){ showLimit(st); return; }   // llegó al límite diario
   LAST = { st, inp };
   go('login');                 // primero preguntamos si quiere iniciar sesión
 }
@@ -916,6 +946,33 @@ async function loginWith(p){
 }
 function proceedToResults(){ if(!LAST.st) return; recordSubmission(LAST.inp); render(LAST.st, LAST.inp); go('result'); }
 
+/* --- pantalla de límite diario alcanzado --- */
+function showLimit(st){
+  const sub=document.getElementById('limitSub');
+  if(sub){
+    const lim = st.daily_limit || 3;
+    sub.textContent = st.is_anon===false
+      ? `Alcanzaste tu límite de ${lim} consultas de hoy. Vuelve mañana para seguir explorando el mercado.`
+      : `Puedes hacer ${lim} consultas gratis al día. Vuelve mañana, o crea tu cuenta para ampliar tu límite.`;
+  }
+  // si ya tiene cuenta, no tiene sentido pedirle el correo de nuevo
+  const promise=document.querySelector('#limit .promise'), row=document.querySelector('#limit .emailrow');
+  const showSignup = st.is_anon!==false;
+  if(promise) promise.style.display = showSignup ? '' : 'none';
+  if(row) row.style.display = showSignup ? '' : 'none';
+  go('limit');
+}
+async function limitSignup(){
+  const email=(document.getElementById('limitEmail').value||'').trim();
+  if(!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ openModal('Revisa tu correo','Escribe un correo válido para enviarte el enlace.'); return; }
+  if(!USE_DB){ openModal('Listo (demo)','En la versión real te enviaríamos un enlace para ampliar tu límite.'); return; }
+  try{
+    const {error}=await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
+    if(error) throw error;
+    openModal('Revisa tu correo','Te enviamos un enlace. Al entrar con tu cuenta tendrás más consultas por día.');
+  }catch(e){ openModal('Ups', (e.message||'No se pudo enviar el enlace')+'.'); }
+}
+
 /* --- registrar el envío para alimentar el modelo (dedup si hay sesión) --- */
 let _recorded=false;
 async function recordSubmission(inp){
@@ -923,15 +980,16 @@ async function recordSubmission(inp){
   try{
     const g = v => inp.cur==='USD' ? v*USD_RATE : v;
     const { data:{ user } } = await sb.auth.getUser();
+    const real = !!(user && !user.is_anonymous);   // solo cuentas con correo dan peso/dedup
     const row = {
       role: inp.role, seniority: inp.sen, exp_band: inp.exp, education: inp.edu,
       location: inp.loc, industry: inp.ind, company_size: inp.size,
       base_salary: Math.round(g(inp.base)), variable: Math.round(g(inp.variable||0)),
       total_comp: Math.round(g(inp.salary)), currency:'GTQ',
       has_benefits: !!inp.prest, skills:[...selectedSkills.keys()],
-      contributor_id: user ? user.id : null
+      contributor_id: real ? user.id : null
     };
-    if(user){ await sb.from('submissions').upsert(row,{onConflict:'contributor_id'}); await upsertContact(user); }
+    if(real){ await sb.from('submissions').upsert(row,{onConflict:'contributor_id'}); await upsertContact(user); }
     else { await sb.from('submissions').insert(row); }
   }catch(e){ console.warn('No se pudo registrar el envío:', e.message||e); }
 }
@@ -975,36 +1033,29 @@ function recommendations(inp){
   recs.sort((a,b)=>b.up-a.up);
   return { recs:recs.filter(r=>r.up>50).slice(0,4), targetP90:personalMedian({...base,sen:NEXT_SEN[inp.sen]||inp.sen}) };
 }
-async function renderRecos(inp){
+function renderRecos(inp, st){
   const box=document.getElementById('recos'), foot=document.getElementById('recoFoot');
-  box.innerHTML=''; foot.textContent='Calculando…';
-  let recs;
-  try{ recs = USE_DB ? await recommendationsDB(inp) : recommendations(inp).recs; }
-  catch(e){ recs = recommendations(inp).recs; }
   box.innerHTML='';
+  const recs = USE_DB ? recommendationsDB(inp, st && st.median) : recommendations(inp).recs;
   if(!recs.length){ foot.textContent='Tu perfil ya es muy competitivo — pocas palancas quedan. ¡Bien hecho!'; return; }
   recs.forEach(r=>{
     const li=document.createElement('li'); li.className='reco';
     li.innerHTML=`<span class="ic">${r.ic}</span><div class="body"><b>${r.title}</b><span>${r.detail}</span></div><span class="up">+${fmt(r.up,inp.cur)}/mes</span>`;
     box.appendChild(li);
   });
-  foot.textContent='Estimaciones según cómo cambia el salario de perfiles similares. Referencial, no es garantía.';
+  foot.textContent='Estimaciones ancladas en la mediana real de tu perfil y en cuánto suele moverse con cada cambio. Referencial, no es garantía.';
 }
-// Recomendaciones basadas en datos reales: compara la mediana del mercado
-// para el mismo perfil con una palanca mejorada (educación, nivel, experiencia, empresa).
-async function recommendationsDB(inp){
-  const base = await estimate(inp);
-  const baseMed = base.median || 0;
-  const levers = [];
-  if(NEXT_EDU[inp.edu]) levers.push({ic:'🎓', title:`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`, detail:'Subir tu nivel educativo eleva el rango del mercado.', mut:{edu:NEXT_EDU[inp.edu]}});
-  if(NEXT_SEN[inp.sen]) levers.push({ic:'↗', title:`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`, detail:'El salto de nivel es el mayor impulsor del salario.', mut:{sen:NEXT_SEN[inp.sen]}});
-  if(NEXT_EXP[inp.exp]) levers.push({ic:'⏳', title:`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`, detail:'Cada tramo de experiencia mueve el rango hacia arriba.', mut:{exp:NEXT_EXP[inp.exp]}});
-  if(inp.size!=='multi') levers.push({ic:'🏢', title:'Apunta a empresas grandes o multinacionales', detail:'Suelen pagar por encima del promedio para tu perfil.', mut:{size:'multi'}});
-  const out = await Promise.all(levers.map(async l=>{
-    const st2 = await estimate({...inp, ...l.mut});
-    return { ic:l.ic, title:l.title, detail:l.detail, up:(st2.median||baseMed)-baseMed };
-  }));
-  return out.filter(r=>r.up>50).sort((a,b)=>b.up-a.up).slice(0,4);
+// Palancas ancladas en la mediana REAL del mercado (sin llamadas extra a la base):
+// el salto de cada factor se estima con su razón de multiplicadores.
+function recommendationsDB(inp, baseMedian){
+  const base = baseMedian || 0;
+  const out = [];
+  const add=(ic,title,detail,ratio)=>{ const up = base*(ratio-1); if(up>50) out.push({ic,title,detail,up}); };
+  if(NEXT_EDU[inp.edu]) add('🎓',`Estudia ${EDU_RECO[NEXT_EDU[inp.edu]]}`,'Subir tu nivel educativo eleva el rango del mercado.', EDU.mult[NEXT_EDU[inp.edu]]/EDU.mult[inp.edu]);
+  if(NEXT_SEN[inp.sen]) add('↗',`Crece a nivel ${SEN.label[NEXT_SEN[inp.sen]]}`,'El salto de nivel es el mayor impulsor del salario.', SEN.mult[NEXT_SEN[inp.sen]]/SEN.mult[inp.sen]);
+  if(NEXT_EXP[inp.exp]) add('⏳',`Acumula experiencia (${EXP.label[NEXT_EXP[inp.exp]]})`,'Cada tramo de experiencia mueve el rango hacia arriba.', EXP.mult[NEXT_EXP[inp.exp]]/EXP.mult[inp.exp]);
+  if(inp.size!=='multi') add('🏢','Apunta a empresas grandes o multinacionales','Suelen pagar por encima del promedio para tu perfil.', SIZE.mult['multi']/SIZE.mult[inp.size]);
+  return out.sort((a,b)=>b.up-a.up).slice(0,4);
 }
 
 function render(st,inp){
@@ -1052,7 +1103,7 @@ function render(st,inp){
     ? `Pocos datos aún — este perfil se ocultaría hasta reunir 5+ respuestas.`
     : `Basado en ~${nShow} perfiles similares.`;
 
-  renderRecos(inp);
+  renderRecos(inp, st);
   drawCurve(st,inp);
 }
 

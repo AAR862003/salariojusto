@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Value Compass — map what your job owes you</title>
+<style>
+:root{
+  --bg:#1a1a1f;
+  --panel:#212129;
+  --panel-2:#262630;
+  --line:#31313d;
+  --line-soft:#292933;
+  --ink:#ECECEF;
+  --ink-2:#AFAFBC;
+  --muted:#7C7C8B;
+  --teal:#1D9E75;
+  --indigo:#7F77DD;
+  --amber:#BA7517;
+  --coral:#e84c2b;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;line-height:1.5;
+}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+.eyebrow{
+  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;
+}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+.hr{height:1px;background:var(--line-soft);border:0;margin:0}
+button{font-family:inherit;color:inherit;cursor:pointer}
+.btn{
+  background:transparent;border:1px solid var(--line);color:var(--ink);
+  padding:11px 20px;border-radius:2px;font-size:13.5px;font-weight:500;
+  transition:border-color .18s,background .18s,transform .18s;
+}
+.btn:hover{border-color:var(--ink-2);background:#ffffff08}
+.btn:active{transform:translateY(1px)}
+.btn.primary{border-color:var(--teal);color:#CFF3E4}
+.btn.primary:hover{background:#1D9E7518;border-color:var(--teal)}
+.btn.ghost{border-color:transparent;color:var(--muted);padding-left:0}
+.btn.ghost:hover{color:var(--ink-2);background:transparent}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:3px}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.mark{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:600}
+.mark span{color:var(--muted)}
+.phase{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ---------- intro ---------- */
+.hero{padding:64px 0 12px;max-width:660px}
+.hero h1{font-family:var(--serif);font-size:clamp(34px,6.2vw,54px);line-height:1.06;font-weight:400;letter-spacing:-.02em}
+.hero h1 em{font-style:italic;color:var(--ink-2)}
+.lede{color:var(--ink-2);font-size:16.5px;margin:22px 0 0;max-width:56ch}
+.specs{display:flex;gap:0;margin:40px 0 34px;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.spec{padding:16px 26px 16px 0;margin-right:26px;border-right:1px solid var(--line-soft)}
+.spec:last-child{border-right:0}
+.spec b{display:block;font-family:var(--serif);font-size:26px;font-weight:400;font-variant-numeric:tabular-nums}
+.spec span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.note{color:var(--muted);font-size:12.5px;margin-top:18px;max-width:60ch}
+
+/* ---------- duel ---------- */
+.meterbar{display:flex;align-items:center;gap:14px;padding:18px 0 0}
+.track{flex:1;height:2px;background:var(--line);position:relative}
+.fill{position:absolute;inset:0 auto 0 0;background:var(--teal);width:0;transition:width .35s cubic-bezier(.2,.7,.2,1)}
+.count{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.08em}
+.signal{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+.signal b{color:var(--indigo);font-weight:600}
+
+.prompt{margin:56px 0 22px;max-width:52ch}
+.prompt h2{font-family:var(--serif);font-weight:400;font-size:clamp(21px,3.4vw,27px);line-height:1.25}
+.prompt p{color:var(--muted);font-size:13px;margin:10px 0 0}
+
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{
+  position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;padding:26px 24px 22px;min-height:190px;display:flex;flex-direction:column;
+  transition:border-color .18s,background .18s,transform .18s;
+}
+.card:hover{border-color:#4a4a5c;background:var(--panel-2);transform:translateY(-2px)}
+.card .key{
+  font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:600;
+  border:1px solid var(--line);border-radius:2px;padding:2px 7px;align-self:flex-start;
+}
+.card p{font-family:var(--serif);font-size:19.5px;line-height:1.42;color:var(--ink);margin:20px 0 0}
+.card .take{margin-top:auto;padding-top:20px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.card:hover .take{color:var(--teal)}
+.versus{display:none}
+.duel.swap{animation:settle .34s ease}
+@keyframes settle{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.duelfoot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted)}
+kbd{border:1px solid var(--line);border-radius:2px;padding:1px 5px;font-family:var(--sans);font-size:11px;color:var(--ink-2)}
+
+/* ---------- interstitial ---------- */
+.peek{max-width:560px;padding:60px 0}
+.peek ol{list-style:none;padding:0;margin:26px 0 34px;border-top:1px solid var(--line-soft)}
+.peek li{display:flex;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.peek li i{font-style:normal;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;width:20px}
+.peek li b{font-weight:500;font-size:17px}
+
+/* ---------- audit ---------- */
+.auditlist{margin:34px 0 0;border-top:1px solid var(--line-soft)}
+.arow{display:grid;grid-template-columns:1fr auto;gap:12px 20px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line-soft)}
+.arow .name{display:flex;align-items:baseline;gap:11px;min-width:0}
+.arow .rank{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;width:18px;flex:none}
+.arow .lbl{font-size:15.5px;font-weight:500}
+.arow .wt{height:2px;background:var(--indigo);opacity:.55;align-self:center;min-width:2px}
+.dots{display:flex;gap:6px}
+.dot{
+  width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:transparent;
+  padding:0;transition:background .15s,border-color .15s,transform .15s;
+}
+.dot:hover{border-color:var(--ink-2);transform:scale(1.08)}
+.dot.on{background:var(--teal);border-color:var(--teal)}
+.dot.on.low{background:var(--coral);border-color:var(--coral)}
+.dot.on.mid{background:var(--amber);border-color:var(--amber)}
+.scalekey{display:flex;justify-content:flex-end;gap:22px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+.sticky{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 42%);padding:22px 0 6px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+
+/* ---------- results ---------- */
+.score{display:flex;gap:34px;align-items:center;padding:44px 0 8px;flex-wrap:wrap}
+.ring{position:relative;width:132px;height:132px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .val b{font-family:var(--serif);font-size:38px;font-weight:400;line-height:1;font-variant-numeric:tabular-nums}
+.ring .val span{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.verdict{max-width:46ch}
+.verdict h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3.6vw,30px);line-height:1.22}
+.verdict p{color:var(--ink-2);font-size:14.5px;margin:12px 0 0}
+
+.sect{padding:48px 0 0}
+.sect > .eyebrow{margin-bottom:20px}
+.tiers{margin:0;border-top:1px solid var(--line-soft)}
+.tier{display:grid;grid-template-columns:22px 1.1fr 1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line-soft)}
+.tier .r{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tier .n{font-size:15.5px;font-weight:500}
+.tier .n small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:3px}
+.bars{position:relative;height:22px}
+.bar{position:absolute;left:0;height:6px;border-radius:1px}
+.bar.imp{top:2px;background:#7F77DD;opacity:.5}
+.bar.del{top:12px;background:var(--teal)}
+.bar.gap{top:12px;background:repeating-linear-gradient(90deg,var(--coral) 0 3px,transparent 3px 6px)}
+.legend{display:flex;gap:20px;font-size:11px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:16px;height:5px;margin-right:7px;vertical-align:middle;border-radius:1px}
+
+.map{margin-top:6px;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:8px}
+.map svg{display:block;width:100%;height:auto}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.fcard{background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--coral);border-radius:3px;padding:20px 20px 18px}
+.fcard .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.fcard h3{font-size:16.5px;font-weight:600}
+.fcard .pct{font-size:11px;color:var(--coral);letter-spacing:.1em;font-variant-numeric:tabular-nums;font-weight:600}
+.fcard p{font-size:13.5px;color:var(--ink-2);margin:12px 0 0}
+.fcard .ask{font-size:12.5px;color:var(--ink);margin-top:14px;padding-top:13px;border-top:1px solid var(--line-soft)}
+.fcard .ask em{font-style:normal;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;font-size:10px;display:block;margin-bottom:6px;font-weight:600}
+.fcard.surplus{border-left-color:var(--amber)}
+.fcard.surplus .pct{color:var(--amber)}
+.fcard.anchor{border-left-color:var(--teal)}
+.fcard.anchor .pct{color:var(--teal)}
+
+.trade{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:24px}
+.trade p{margin:0;font-family:var(--serif);font-size:18px;line-height:1.5}
+.trade p b{font-weight:400;border-bottom:1px solid var(--amber)}
+.trade p i{font-style:normal;border-bottom:1px solid var(--coral)}
+.trade .sub{font-family:var(--sans);font-size:13px;color:var(--ink-2);margin-top:14px}
+
+.brief{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:26px}
+.brief h3{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.brief .band{padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid var(--line-soft)}
+.brief .band:last-child{border-bottom:0;padding-bottom:0;margin-bottom:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:2px;padding:6px 12px;font-size:13px}
+.chip.hard{border-color:#1D9E7566;color:#CFF3E4}
+.chip.soft{color:var(--muted)}
+.qlist{margin:0;padding:0;list-style:none}
+.qlist li{padding:11px 0;border-bottom:1px solid var(--line-soft);font-size:14px;display:flex;gap:12px}
+.qlist li:last-child{border-bottom:0}
+.qlist li span{color:var(--indigo);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;flex:none;width:104px;padding-top:3px}
+.qlist li q{font-family:var(--serif);font-size:15.5px;quotes:'"' '"'}
+textarea.export{width:100%;height:150px;background:var(--bg);border:1px solid var(--line);color:var(--ink-2);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;padding:12px;border-radius:2px;margin-top:14px;display:none}
+.toast{font-size:12px;color:var(--teal);margin-left:12px}
+.footactions{display:flex;gap:10px;align-items:center;padding:44px 0 0;flex-wrap:wrap}
+
+.hidden{display:none!important}
+@media (max-width:760px){
+  .duel{grid-template-columns:1fr}
+  .card{min-height:0}
+  .card p{font-size:18px}
+  .grid2{grid-template-columns:1fr}
+  .tier{grid-template-columns:20px 1fr;gap:8px 14px}
+  .tier .bars{grid-column:2}
+  .arow{grid-template-columns:1fr}
+  .dots{justify-content:space-between;max-width:230px}
+  .qlist li{flex-direction:column;gap:4px}
+  .qlist li span{width:auto}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="mark">Value <span>/</span> Compass</div>
+    <div class="phase" id="phase">Start</div>
+  </div>
+
+  <!-- ============ INTRO ============ -->
+  <section id="s-intro">
+    <div class="hero">
+      <h1>There is no good job or bad job. Only a job that <em>fits what matters to you right now.</em></h1>
+      <p class="lede">Fourteen things a job can give you. You will not rank them on a list — lists flatter you. Instead you'll be handed two situations at a time and forced to take one. Thirty small betrayals later, your real hierarchy is on the table.</p>
+    </div>
+    <div class="specs">
+      <div class="spec"><b>14</b><span>Forces in play</span></div>
+      <div class="spec"><b>30</b><span>Forced choices</span></div>
+      <div class="spec"><b>4</b><span>Minutes</span></div>
+      <div class="spec"><b>1</b><span>Map of your job</span></div>
+    </div>
+    <button class="btn primary" id="go">Begin the first choice</button>
+    <p class="note">Nothing is stored on a server. Answer for the version of you that exists this month, not the one from five years ago.</p>
+  </section>
+
+  <!-- ============ DUEL ============ -->
+  <section id="s-duel" class="hidden">
+    <div class="meterbar">
+      <span class="count" id="count">01 / 30</span>
+      <span class="track"><span class="fill" id="fill"></span></span>
+      <span class="signal">Signal <b id="signal">0%</b></span>
+    </div>
+    <div class="prompt">
+      <h2 id="framing">Both offers are identical in every other way. Which one do you take?</h2>
+      <p>Don't optimize for who you want to be. Pick the one you'd actually be relieved to have.</p>
+    </div>
+    <div class="duel" id="duel">
+      <button class="card" id="cardA" data-side="0">
+        <span class="key">A</span>
+        <p id="textA"></p>
+        <span class="take">Take this one</span>
+      </button>
+      <button class="card" id="cardB" data-side="1">
+        <span class="key">B</span>
+        <p id="textB"></p>
+        <span class="take">Take this one</span>
+      </button>
+    </div>
+    <div class="duelfoot">
+      <span class="hint">Keyboard: <kbd>A</kbd> / <kbd>B</kbd> or <kbd>←</kbd> <kbd>→</kbd></span>
+      <button class="btn ghost hidden" id="earlyout">My mind is made up — go to the map</button>
+    </div>
+  </section>
+
+  <!-- ============ PEEK ============ -->
+  <section id="s-peek" class="hidden">
+    <div class="peek">
+      <div class="eyebrow" id="peekEyebrow">Checkpoint</div>
+      <h2 style="font-family:var(--serif);font-weight:400;font-size:28px;margin-top:14px">What's pulling ahead so far</h2>
+      <ol id="peekList"></ol>
+      <button class="btn primary" id="peekOn">Keep going</button>
+    </div>
+  </section>
+
+  <!-- ============ AUDIT ============ -->
+  <section id="s-audit" class="hidden">
+    <div class="hero" style="padding:52px 0 0">
+      <div class="eyebrow">Part two</div>
+      <h1 style="font-size:clamp(28px,5vw,42px);margin-top:14px">Now score the job you have today.</h1>
+      <p class="lede">Not the job on paper. The one you woke up to this morning. How much of each thing does it actually give you?</p>
+    </div>
+    <div class="scalekey"><span>None</span><span>Fully</span></div>
+    <div class="auditlist" id="auditList"></div>
+    <div class="sticky">
+      <span class="hint" id="auditProgress">0 of 14 scored</span>
+      <button class="btn primary" id="toResults" disabled>Draw my map</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="s-results" class="hidden">
+    <div class="score">
+      <div class="ring">
+        <svg viewBox="0 0 132 132" width="132" height="132">
+          <circle cx="66" cy="66" r="58" fill="none" stroke="#31313d" stroke-width="6"></circle>
+          <circle id="ringArc" cx="66" cy="66" r="58" fill="none" stroke="#1D9E75" stroke-width="6" stroke-linecap="butt" stroke-dasharray="0 999"></circle>
+        </svg>
+        <div class="val"><b id="alignNum">0</b><span>Alignment</span></div>
+      </div>
+      <div class="verdict">
+        <h2 id="verdictH"></h2>
+        <p id="verdictP"></p>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="eyebrow">Your hierarchy, and what the job returns</div>
+      <div class="tiers" id="tiers"></div>
+      <div class="legend">
+        <span><i style="background:#7F77DD;opacity:.5"></i>How much it matters to you</span>
+        <span><i style="background:#1D9E75"></i>How much you're getting</span>
+        <span><i style="background:repeating-linear-gradient(90deg,#e84c2b 0 3px,transparent 3px 6px)"></i>The shortfall</span>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="eyebrow">Friction map</div>
+      <div class="map" id="mapWrap"></div>
+    </div>
+
+    <div class="sect">
+      <div class="eyebrow">Where the friction actually is</div>
+      <div class="grid2" id="frictions"></div>
+    </div>
+
+    <div class="sect" id="tradeSect">
+      <div class="eyebrow">The trade on the table</div>
+      <div class="trade" id="trade"></div>
+    </div>
+
+    <div class="sect">
+      <div class="eyebrow">If you're looking — your screening brief</div>
+      <div class="brief">
+        <div class="band">
+          <h3>Non-negotiable</h3>
+          <div class="chips" id="hardChips"></div>
+        </div>
+        <div class="band">
+          <h3>Tradeable — spend these to buy the ones above</h3>
+          <div class="chips" id="softChips"></div>
+        </div>
+        <div class="band">
+          <h3>Ask these in the interview</h3>
+          <ul class="qlist" id="questions"></ul>
+        </div>
+        <div class="band">
+          <h3>Walk away when you see this</h3>
+          <ul class="qlist" id="flags"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footactions">
+      <button class="btn primary" id="copyBrief">Copy my brief as text</button>
+      <button class="btn" id="printIt">Print / save as PDF</button>
+      <button class="btn ghost" id="restart">Start over</button>
+      <span class="toast hidden" id="toast">Copied</span>
+    </div>
+    <textarea class="export" id="exportBox" readonly></textarea>
+    <p class="note" id="consistency"></p>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   Each value carries three interchangeable scenario fragments.
+   The value is never named during the duel — only the situation.
+   ========================================================= */
+const VALUES = [
+  { id:'mission', label:'Mission', tag:'Purpose',
+    sc:["You end each day knowing the work moved something you actually care about.",
+        "You'd explain what this company does at a family dinner, and mean every word.",
+        "The problem you're solving is one you'd think about for free."],
+    negotiate:"Ask to be moved onto the product, client or program whose outcome you'd defend in public — even at flat scope and flat pay.",
+    ask:"Tell me about a decision where this company chose the mission over the margin.",
+    flag:"Nobody in the room can explain why the work matters without reaching for a revenue number." },
+
+  { id:'team', label:'Team', tag:'The people',
+    sc:["The people around you are sharp, generous, and make your own work better.",
+        "You look forward to the Monday meeting because of who's in it.",
+        "You could call any teammate at 9pm with a problem and they'd pick up."],
+    negotiate:"Change who you sit with before you change where you work. Ask to join the squad or project with the people you learn from.",
+    ask:"Who would I be in a room with every day — and can I meet two of them before I decide?",
+    flag:"They won't let you meet the team you'd work with until after you sign." },
+
+  { id:'location', label:'Location', tag:'Where you live',
+    sc:["Ten minutes from home, in the city your life is already built around.",
+        "No move, no relocation, nobody in your family has to be uprooted.",
+        "You keep the neighborhood, the school run, and the short commute."],
+    negotiate:"Fix the geography first — it charges you every single day. Push for the closer site, the home-based arrangement, or the base city in writing.",
+    ask:"Where is this role physically based in eighteen months, and who decides that?",
+    flag:"Relocation is 'unlikely' but nobody will put the base location in the offer letter." },
+
+  { id:'boss', label:'Boss', tag:'Your manager',
+    sc:["A manager who defends your work in rooms you're not standing in.",
+        "Clear direction, real feedback, and no guessing what they think of you.",
+        "You trust the person you report to — completely and without caveats."],
+    negotiate:"Ask for a reporting-line change, or at minimum a standing weekly with written feedback. A bad manager is a fixable variable more often than people assume.",
+    ask:"How does my future manager give feedback, and who do they report to?",
+    flag:"The person you'd report to doesn't bother showing up to the interview." },
+
+  { id:'salary', label:'Salary', tag:'Cash today',
+    sc:["The number on the offer is well above what you're paid now.",
+        "Pay that ends the monthly arithmetic running in the back of your head.",
+        "A serious raise, every month, with no asterisks attached."],
+    negotiate:"Bring a market band, not a feeling. Ask for the correction in writing with a date, and name the number first.",
+    ask:"What's the full band for this level, and where in it would I land on day one?",
+    flag:"Compensation stays deliberately vague until after you've said yes." },
+
+  { id:'benefits', label:'Benefits', tag:'The safety net',
+    sc:["Health coverage, retirement and leave that hold up when life goes wrong.",
+        "The insurance covers your family without a phone call and a fight.",
+        "Real medical, real pension, real paid time off that people actually take."],
+    negotiate:"Audit what your household actually uses, then ask for those specific gaps to be closed. Benefits are cheaper for a company to give than salary.",
+    ask:"What does coverage look like for dependents, and what's excluded?",
+    flag:"The benefit is on the careers page but nobody internally can name the provider." },
+
+  { id:'flex', label:'Flexible Schedule', tag:'Control of time',
+    sc:["You decide when the workday starts and when it ends.",
+        "You can take a Tuesday afternoon for a school event without asking permission.",
+        "Remote when you need it, and no explanation is expected."],
+    negotiate:"Ask for the specific hours you need as a written arrangement, not an informal favor. Favors evaporate when your manager changes.",
+    ask:"Who on this team works a non-standard schedule today, and how does that go?",
+    flag:"Flexibility is 'part of the culture' but every meeting that matters is at 7am." },
+
+  { id:'resp', label:'Responsibilities', tag:'The actual work',
+    sc:["The day-to-day tasks are the ones you're genuinely good at and enjoy doing.",
+        "Real ownership: the decisions are yours to make and yours to defend.",
+        "You spend your hours on the craft itself, not on the overhead around it."],
+    negotiate:"Trade the tasks that drain you for the ones you're best at. Redesign the scope of the job you're in — it's the most granted request on this list.",
+    ask:"Walk me through what I'd actually be doing in the first ninety days, hour by hour.",
+    flag:"The job description is a list of nouns and adjectives, never a description of work." },
+
+  { id:'title', label:'Title', tag:'Standing on paper',
+    sc:["The title on your card lands the moment you say it out loud.",
+        "You get the senior title now, on paper, not in two years.",
+        "A title that finally matches the work you're already doing."],
+    negotiate:"Ask for the title now and the scope later. Titles cost a company almost nothing and are painful to reclaim once given.",
+    ask:"What title comes with this role, and what has to be true for the next one?",
+    flag:"They offer the responsibility immediately and the title 'once you've proven it'." },
+
+  { id:'org', label:'Organization', tag:'The institution',
+    sc:["A company whose name opens doors and needs no explanation.",
+        "You're quietly proud of the logo on your badge.",
+        "An institution that's stable, respected, and will outlast your tenure."],
+    negotiate:"If the name on the badge matters to you, invest in the institution's reputation rather than planning your exit from it.",
+    ask:"Where is this company positioned three years out, and who is making that call?",
+    flag:"The brand is admired from outside and hollow the moment you're inside it." },
+
+  { id:'travel', label:'Travel', tag:'Movement',
+    sc:["You're on the road often, seeing places on the company's account.",
+        "The job puts you somewhere new most months.",
+        "Field visits and flights instead of the same desk in the same building."],
+    negotiate:"Volunteer for the field assignments, client visits and launches — the parts of the mandate that move.",
+    ask:"How many days a year would I be traveling, and to where?",
+    flag:"Travel is sold to you as a perk and managed internally as a cost to cut." },
+
+  { id:'advance', label:'Opportunity for Advancement', tag:'The next rung',
+    sc:["A clear path: this seat leads somewhere bigger within two years.",
+        "You can see the next three rungs of the ladder from where you'd stand.",
+        "The role is built to promote you, not to park you."],
+    negotiate:"Ask for the written promotion criteria and a calendar date to review them against. Vague ambition is how good people get parked.",
+    ask:"Who last held this role, and where are they in the company now?",
+    flag:"Nobody has ever been promoted out of the seat you're being offered." },
+
+  { id:'national', label:'National Exposure', tag:'Reputation at home',
+    sc:["Your name becomes known across the country in your field.",
+        "You speak at the national conference; people in your industry know your work.",
+        "Visibility that belongs to you, not only to your employer."],
+    negotiate:"Volunteer for the industry panel, the trade article, the association seat. Reputation is portable in a way that internal standing is not.",
+    ask:"Would I represent the company publicly, and with how much latitude?",
+    flag:"Every external voice funnels through one executive, and it will never be you." },
+
+  { id:'intl', label:'International Exposure', tag:'Reach across borders',
+    sc:["You work across borders, with counterparts on three continents.",
+        "Your work is used and seen well outside your own country.",
+        "Global scope: foreign markets, foreign peers, decisions that cross borders."],
+    negotiate:"Ask to own the cross-border slice of your current mandate — the export line, the regional rollout, the foreign counterpart relationship.",
+    ask:"Which parts of this role actually operate outside the country?",
+    flag:"'Regional' describes the org chart, never your calendar." }
+];
+
+const PROMPTS = [
+  "Both offers are identical in every other way. Which one do you take?",
+  "Same company, same pay. You can only have one of these. Which?",
+  "Two roles land on the same day. One thing separates them. Which do you sign?",
+  "You can protect exactly one of these for the next two years. Which?",
+  "A recruiter can only guarantee one. Which do you make them promise?"
+];
+
+const TOTAL = 30, OPEN_ROUNDS = 14, EARLY_OK = 22, K = 32;
+const LEVELS = ['None','Barely','Partly','Mostly','Fully'];
+
+/* =========================================================
+   STATE + ENGINE
+   ========================================================= */
+let S = {};
+function reset(){
+  S = {
+    score:{}, n:{}, scIdx:{}, asked:new Set(), queue:[], round:0,
+    upsets:0, decisions:0, delivery:{}, ranked:[], pair:null, order:[0,1], peeked:new Set()
+  };
+  VALUES.forEach(v=>{ S.score[v.id]=1000; S.n[v.id]=0; S.scIdx[v.id]=Math.floor(Math.random()*3); });
+  S.queue = openingRounds();
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function pairKey(a,b){ return [a,b].sort().join('|'); }
+
+/* Two random perfect matchings guarantee every value is seen at least twice
+   before the adaptive engine starts making assumptions. */
+function openingRounds(){
+  const out=[], seen=new Set();
+  for(let pass=0;pass<2;pass++){
+    let ids;
+    let tries=0;
+    do{
+      ids = shuffle(VALUES.map(v=>v.id));
+      tries++;
+    } while(tries<40 && ids.some((id,i)=> i%2===0 && seen.has(pairKey(id, ids[i+1]))));
+    for(let i=0;i<ids.length;i+=2){ out.push([ids[i],ids[i+1]]); seen.add(pairKey(ids[i],ids[i+1])); }
+  }
+  return out.slice(0,OPEN_ROUNDS);
+}
+
+/* Adaptive: favour pairs that are close in score (genuinely undecided)
+   and involve values we've measured least. */
+function nextPair(){
+  if(S.queue.length) return S.queue.shift();
+  let best=null, bestP=-1;
+  for(let i=0;i<VALUES.length;i++){
+    for(let j=i+1;j<VALUES.length;j++){
+      const a=VALUES[i].id, b=VALUES[j].id;
+      if(S.asked.has(pairKey(a,b))) continue;
+      const closeness = Math.exp(-Math.abs(S.score[a]-S.score[b])/140);
+      const uncertainty = 1/(1+Math.min(S.n[a],S.n[b]));
+      const p = closeness*1.0 + uncertainty*0.9 + Math.random()*0.12;
+      if(p>bestP){ bestP=p; best=[a,b]; }
+    }
+  }
+  if(!best){ const s=shuffle(VALUES.map(v=>v.id)); best=[s[0],s[1]]; }
+  return best;
+}
+function signal(){
+  const avg = VALUES.reduce((s,v)=> s + 1/(1+S.n[v.id]), 0)/VALUES.length;
+  return Math.round(Math.max(0, Math.min(1, (1-avg)*1.18))*100);
+}
+function record(win, lose){
+  const ea = 1/(1+Math.pow(10,(S.score[lose]-S.score[win])/400));
+  S.decisions++;
+  if(S.score[win] < S.score[lose]-90) S.upsets++;
+  S.score[win] += K*(1-ea);
+  S.score[lose] -= K*(1-ea);
+  S.n[win]++; S.n[lose]++;
+  S.asked.add(pairKey(win,lose));
+}
+function ranking(){
+  return VALUES.slice().sort((a,b)=> S.score[b.id]-S.score[a.id]);
+}
+function importanceOf(){
+  const sc = VALUES.map(v=>S.score[v.id]);
+  const lo=Math.min(...sc), hi=Math.max(...sc), span=(hi-lo)||1;
+  const out={};
+  VALUES.forEach(v=>{ out[v.id] = (S.score[v.id]-lo)/span; });
+  return out;
+}
+
+/* =========================================================
+   VIEW HELPERS
+   ========================================================= */
+const $ = id=>document.getElementById(id);
+const V = id=>VALUES.find(v=>v.id===id);
+function show(which){
+  ['intro','duel','peek','audit','results'].forEach(s=> $('s-'+s).classList.toggle('hidden', s!==which));
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- duel ---------- */
+function renderDuel(){
+  S.round++;
+  if(S.round>TOTAL){ return startAudit(); }
+  S.pair = nextPair();
+  S.order = Math.random()<0.5 ? [0,1] : [1,0];
+  const a = V(S.pair[S.order[0]]), b = V(S.pair[S.order[1]]);
+  $('textA').textContent = a.sc[S.scIdx[a.id]%3];
+  $('textB').textContent = b.sc[S.scIdx[b.id]%3];
+  S.scIdx[a.id]++; S.scIdx[b.id]++;
+  $('framing').textContent = PROMPTS[(S.round-1)%PROMPTS.length];
+  $('count').textContent = String(S.round).padStart(2,'0')+' / '+TOTAL;
+  $('fill').style.width = ((S.round-1)/TOTAL*100)+'%';
+  $('signal').textContent = signal()+'%';
+  $('phase').textContent = 'Choosing · '+String(S.round).padStart(2,'0')+'/'+TOTAL;
+  $('earlyout').classList.toggle('hidden', S.round < EARLY_OK);
+  const d=$('duel'); d.classList.remove('swap'); void d.offsetWidth; d.classList.add('swap');
+}
+function choose(side){
+  if(!S.pair) return;
+  const winId = S.pair[S.order[side]];
+  const loseId = S.pair[S.order[1-side]];
+  record(winId, loseId);
+  $('fill').style.width = (S.round/TOTAL*100)+'%';
+  S.pair=null;
+  if((S.round===10||S.round===20) && !S.peeked.has(S.round)){ S.peeked.add(S.round); return renderPeek(); }
+  if(S.round>=TOTAL) return startAudit();
+  renderDuel();
+}
+$('cardA').onclick = ()=>choose(0);
+$('cardB').onclick = ()=>choose(1);
+document.addEventListener('keydown', e=>{
+  if($('s-duel').classList.contains('hidden')) return;
+  const k=e.key.toLowerCase();
+  if(k==='a'||k==='arrowleft'||k==='1') choose(0);
+  if(k==='b'||k==='arrowright'||k==='2') choose(1);
+});
+
+/* ---------- peek ---------- */
+function renderPeek(){
+  const top = ranking().slice(0,3);
+  $('peekEyebrow').textContent = 'Checkpoint · '+S.round+' choices in';
+  $('peekList').innerHTML = top.map((v,i)=>
+    `<li><i>${String(i+1).padStart(2,'0')}</i><b>${esc(v.label)}</b></li>`).join('');
+  $('phase').textContent='Checkpoint';
+  show('peek');
+}
+$('peekOn').onclick = ()=>{ show('duel'); renderDuel(); };
+
+/* ---------- audit ---------- */
+function startAudit(){
+  S.ranked = ranking();
+  const imp = importanceOf();
+  $('auditList').innerHTML = S.ranked.map((v,i)=>`
+    <div class="arow" data-id="${v.id}">
+      <div class="name">
+        <span class="rank">${String(i+1).padStart(2,'0')}</span>
+        <span class="lbl">${esc(v.label)}</span>
+        <span class="wt" style="width:${Math.round(6+imp[v.id]*54)}px"></span>
+      </div>
+      <div class="dots">${LEVELS.map((L,k)=>
+        `<button class="dot" data-v="${v.id}" data-k="${k}" title="${L}" aria-label="${esc(v.label)}: ${L}"></button>`).join('')}
+      </div>
+    </div>`).join('');
+  $('auditList').querySelectorAll('.dot').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id=btn.dataset.v, k=+btn.dataset.k;
+      S.delivery[id]=k;
+      const row=$('auditList').querySelector(`.arow[data-id="${id}"]`);
+      row.querySelectorAll('.dot').forEach((d,i)=>{
+        d.classList.toggle('on', i<=k);
+        d.classList.remove('low','mid');
+        if(i<=k){ if(k<=1) d.classList.add('low'); else if(k===2) d.classList.add('mid'); }
+      });
+      const done=Object.keys(S.delivery).length;
+      $('auditProgress').textContent = done+' of 14 scored';
+      $('toResults').disabled = done<14;
+    };
+  });
+  $('phase').textContent='Scoring your job';
+  show('audit');
+}
+$('toResults').onclick = renderResults;
+$('earlyout').onclick = startAudit;
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+function computed(){
+  const imp = importanceOf();
+  const rows = S.ranked.map(v=>{
+    const i = imp[v.id], d = (S.delivery[v.id]??0)/4;
+    return { v, imp:i, del:d, friction:i*(1-d), surplus:(1-i)*d };
+  });
+  const wsum = rows.reduce((s,r)=>s+r.imp,0)||1;
+  const align = Math.round(rows.reduce((s,r)=>s+r.imp*r.del,0)/wsum*100);
+  return {rows, align};
+}
+function renderResults(){
+  const {rows, align} = computed();
+
+  /* ring */
+  const C = 2*Math.PI*58;
+  $('ringArc').setAttribute('stroke-dasharray', (C*align/100)+' '+C);
+  $('ringArc').setAttribute('stroke', align>=70?'#1D9E75':align>=45?'#BA7517':'#e84c2b');
+  $('alignNum').textContent = align;
+
+  const frictions = rows.slice().sort((a,b)=>b.friction-a.friction).filter(r=>r.friction>0.08);
+  const surpluses = rows.slice().sort((a,b)=>b.surplus-a.surplus).filter(r=>r.surplus>0.25);
+  const anchors  = rows.filter(r=>r.imp>=0.55 && r.del>=0.75).slice(0,2);
+  const top3 = rows.slice(0,3).map(r=>r.v.label);
+
+  /* verdict */
+  let h,p;
+  if(align>=75){
+    h = "This job is paying you in the currency you actually spend.";
+    p = `Your top three — ${top3.join(', ')} — are largely being delivered. The risk here isn't friction, it's drift: values move, and the fit you have today was built for who you were a while ago. Protect the ${(anchors[0]?anchors[0].v.label:top3[0]).toLowerCase()} before you optimize anything else.`;
+  } else if(align>=50){
+    h = "A workable job with one or two expensive leaks.";
+    p = `You're getting most of what you care about, but not the part that costs you daily. ${frictions[0]?frictions[0].v.label:'One force'} is where the resentment accumulates. This is a renegotiation, not a resignation — fix that one thing and the alignment moves more than a new job would.`;
+  } else if(align>=30){
+    h = "The mismatch is structural, not moody.";
+    p = `Two or three of the things highest on your list are simply not in this role, and no amount of effort inside it produces them. Take the top friction below to your manager as a specific request with a date. If the answer is no twice, you have your answer.`;
+  } else {
+    h = "You are being paid in a currency you don't spend.";
+    p = `Almost everything you rank highly is absent, and what the job does give you sits at the bottom of your list. That's not a bad attitude — it's a bad fit, and it's measurable. Use the screening brief below and start looking deliberately rather than reactively.`;
+  }
+  $('verdictH').textContent = h; $('verdictP').textContent = p;
+
+  /* tiers */
+  $('tiers').innerHTML = rows.map((r,i)=>{
+    const impW = 6+r.imp*94, delW = 6+r.del*94;
+    const gap = Math.max(0, impW-delW);
+    return `<div class="tier">
+      <span class="r">${String(i+1).padStart(2,'0')}</span>
+      <span class="n">${esc(r.v.label)}<small>${esc(r.v.tag)}</small></span>
+      <span class="bars">
+        <span class="bar imp" style="width:${impW}%"></span>
+        <span class="bar del" style="width:${delW}%"></span>
+        <span class="bar gap" style="left:${delW}%;width:${gap}%"></span>
+      </span>
+    </div>`;
+  }).join('');
+
+  renderMap(rows);
+
+  /* friction + surplus + anchor cards */
+  const cards = [];
+  frictions.slice(0,3).forEach(r=>{
+    cards.push(`<div class="fcard">
+      <div class="top"><h3>${esc(r.v.label)}</h3><span class="pct">Gap ${Math.round(r.friction*100)}</span></div>
+      <p>Ranked #${rows.indexOf(r)+1} of 14 for you, and the job delivers it "${LEVELS[S.delivery[r.v.id]]}". That distance is what you feel on Sunday nights.</p>
+      <div class="ask"><em>The specific ask</em>${esc(r.v.negotiate)}</div>
+    </div>`);
+  });
+  if(surpluses[0]) cards.push(`<div class="fcard surplus">
+      <div class="top"><h3>${esc(surpluses[0].v.label)}</h3><span class="pct">Surplus ${Math.round(surpluses[0].surplus*100)}</span></div>
+      <p>The job hands you plenty of this and you ranked it #${rows.indexOf(surpluses[0])+1}. It's real value — it just isn't yours. That makes it the thing you can afford to trade.</p>
+      <div class="ask"><em>Use it</em>Offer to give some of this up in exchange for something at the top of your list. That's a cheap trade for your employer and an expensive one for you to keep paying for.</div>
+    </div>`);
+  if(anchors[0]) cards.push(`<div class="fcard anchor">
+      <div class="top"><h3>${esc(anchors[0].v.label)}</h3><span class="pct">Anchor</span></div>
+      <p>High on your list and genuinely delivered. This is the reason a move is risky — most offers won't replace it, and you'd notice within a month.</p>
+      <div class="ask"><em>Guard it</em>Any job you consider has to match this before anything else on the offer matters.</div>
+    </div>`);
+  $('frictions').innerHTML = cards.join('') || `<div class="fcard anchor"><h3>No material gaps</h3><p>Your hierarchy and your current job are closely matched. Re-run this in six months — the ranking moves faster than the job does.</p></div>`;
+
+  /* the trade */
+  if(frictions[0] && surpluses[0]){
+    $('trade').innerHTML = `<p>You are currently accepting <b>${esc(surpluses[0].v.label)}</b> — which you ranked #${rows.indexOf(surpluses[0])+1} — as payment for going without <i>${esc(frictions[0].v.label)}</i>, which you ranked #${rows.indexOf(frictions[0])+1}.</p>
+      <div class="sub">That's the whole negotiation in one sentence. Say it out loud in your next review and offer the swap explicitly rather than hoping someone notices.</div>`;
+    $('tradeSect').classList.remove('hidden');
+  } else { $('tradeSect').classList.add('hidden'); }
+
+  /* brief */
+  const hard = rows.slice(0,4), soft = rows.slice(-4).reverse();
+  $('hardChips').innerHTML = hard.map(r=>`<span class="chip hard">${esc(r.v.label)}</span>`).join('');
+  $('softChips').innerHTML = soft.map(r=>`<span class="chip soft">${esc(r.v.label)}</span>`).join('');
+  $('questions').innerHTML = hard.map(r=>`<li><span>${esc(r.v.label)}</span><q>${esc(r.v.ask)}</q></li>`).join('');
+  $('flags').innerHTML = hard.map(r=>`<li><span>${esc(r.v.label)}</span><q>${esc(r.v.flag)}</q></li>`).join('');
+
+  /* consistency */
+  const cons = Math.round((1 - S.upsets/Math.max(1,S.decisions))*100);
+  $('consistency').textContent = `Built from ${S.decisions} forced choices. Consistency ${cons}% — how often your picks agreed with each other. Above 80% means the hierarchy is stable; below 65% usually means two values are genuinely tied, or you were answering as who you'd like to be.`;
+
+  $('exportBox').value = briefText(rows, align, frictions, surpluses);
+  $('phase').textContent='Your map';
+  show('results');
+}
+
+function renderMap(rows){
+  const W=680,H=430,P={l:52,r:24,t:26,b:46};
+  const x = d => P.l + d*(W-P.l-P.r);
+  const y = i => H-P.b - i*(H-P.t-P.b);
+  const quad = r => r.imp>=0.5 ? (r.del>=0.5?'#1D9E75':'#e84c2b') : (r.del>=0.5?'#BA7517':'#7C7C8B');
+  let dots='', labels='';
+  const sorted = rows.slice().sort((a,b)=>a.del-b.del);
+  sorted.forEach((r,idx)=>{
+    const cx=x(r.del), cy=y(r.imp), c=quad(r), rad = 4+r.imp*4;
+    dots += `<line x1="${cx}" y1="${cy}" x2="${x(1)}" y2="${cy}" stroke="${c}" stroke-width="1" stroke-dasharray="2 4" opacity=".22"/>`;
+    dots += `<circle cx="${cx}" cy="${cy}" r="${rad}" fill="${c}" opacity=".9"/>`;
+    const flip = cx > W-180;
+    const anchor = flip?'end':'start';
+    const tx = flip? cx-11 : cx+11;
+    const dy = (idx%2===0)? -1 : 11;
+    labels += `<text x="${tx}" y="${cy+dy}" fill="#AFAFBC" font-size="11.5" text-anchor="${anchor}" font-family="-apple-system,Segoe UI,sans-serif">${esc(r.v.label)}</text>`;
+  });
+  $('mapWrap').innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Friction map: importance against delivery">
+    <rect x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="none" stroke="#31313d"/>
+    <line x1="${x(.5)}" y1="${P.t}" x2="${x(.5)}" y2="${H-P.b}" stroke="#31313d" stroke-dasharray="3 5"/>
+    <line x1="${P.l}" y1="${y(.5)}" x2="${W-P.r}" y2="${y(.5)}" stroke="#31313d" stroke-dasharray="3 5"/>
+    <text x="${P.l+10}" y="${P.t+18}" fill="#e84c2b" font-size="10" letter-spacing="1.6" font-family="-apple-system,sans-serif">REPAIR OR LEAVE</text>
+    <text x="${W-P.r-10}" y="${P.t+18}" fill="#1D9E75" font-size="10" letter-spacing="1.6" text-anchor="end" font-family="-apple-system,sans-serif">PROTECT</text>
+    <text x="${P.l+10}" y="${H-P.b-10}" fill="#7C7C8B" font-size="10" letter-spacing="1.6" font-family="-apple-system,sans-serif">IGNORE</text>
+    <text x="${W-P.r-10}" y="${H-P.b-10}" fill="#BA7517" font-size="10" letter-spacing="1.6" text-anchor="end" font-family="-apple-system,sans-serif">SURPLUS — TRADEABLE</text>
+    ${dots}${labels}
+    <text x="${P.l}" y="${H-14}" fill="#7C7C8B" font-size="10.5" letter-spacing="1.4" font-family="-apple-system,sans-serif">HOW MUCH THIS JOB DELIVERS →</text>
+    <text x="14" y="${P.t+4}" fill="#7C7C8B" font-size="10.5" letter-spacing="1.4" transform="rotate(-90 14 ${P.t+4})" text-anchor="end" font-family="-apple-system,sans-serif">← HOW MUCH IT MATTERS TO YOU</text>
+  </svg>`;
+}
+
+function briefText(rows, align, frictions, surpluses){
+  const L=[];
+  L.push('VALUE COMPASS — PERSONAL BRIEF');
+  L.push('Alignment with current job: '+align+'/100');
+  L.push('');
+  L.push('MY HIERARCHY');
+  rows.forEach((r,i)=> L.push(`${String(i+1).padStart(2,'0')}. ${r.v.label}  — job delivers: ${LEVELS[S.delivery[r.v.id]]}`));
+  L.push('');
+  L.push('TOP FRICTIONS (fix or leave)');
+  frictions.slice(0,3).forEach(r=> L.push(`- ${r.v.label}: ${r.v.negotiate}`));
+  if(surpluses[0]){ L.push(''); L.push('TRADEABLE SURPLUS'); L.push(`- ${surpluses[0].v.label}: plentiful here, low on my list. Offer it in a trade.`); }
+  L.push('');
+  L.push('NON-NEGOTIABLE IN ANY NEXT ROLE');
+  rows.slice(0,4).forEach(r=> L.push('- '+r.v.label));
+  L.push('');
+  L.push('INTERVIEW QUESTIONS');
+  rows.slice(0,4).forEach(r=> L.push(`- (${r.v.label}) ${r.v.ask}`));
+  L.push('');
+  L.push('WALK-AWAY SIGNALS');
+  rows.slice(0,4).forEach(r=> L.push(`- (${r.v.label}) ${r.v.flag}`));
+  return L.join('\n');
+}
+
+/* ---------- actions ---------- */
+$('copyBrief').onclick = async ()=>{
+  const t=$('exportBox').value;
+  try{
+    await navigator.clipboard.writeText(t);
+    $('toast').textContent='Copied'; $('toast').classList.remove('hidden');
+    setTimeout(()=>$('toast').classList.add('hidden'),2200);
+  }catch(e){
+    const box=$('exportBox'); box.style.display='block'; box.focus(); box.select();
+    $('toast').textContent='Select the text below and copy it'; $('toast').classList.remove('hidden');
+  }
+};
+$('printIt').onclick = ()=>window.print();
+$('restart').onclick = ()=>{ reset(); $('phase').textContent='Start'; show('intro'); };
+$('go').onclick = ()=>{ show('duel'); renderDuel(); };
+
+reset();
+</script>
+</body>
+</html>
